@@ -11,7 +11,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use App\Traits\Trace\Trace;
 
-class SetTraceidMiddleware implements MiddlewareInterface
+class SetTraceIdMiddleware implements MiddlewareInterface
 {
 	use Trace;
 
