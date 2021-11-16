@@ -94,30 +94,6 @@ if (!function_exists('format_throwable')) {
 }
 
 
-if (!function_exists('cloudUpload')) {
-	/**
-	 * 云上传
-	 * @param $saveName
-	 * @param $contents
-	 * @param string $cloud
-	 * @return bool
-	 * @throws TypeError
-	 * @throws \Psr\Container\ContainerExceptionInterface
-	 * @throws \Psr\Container\NotFoundExceptionInterface
-	 */
-	function cloudUpload($saveName, $contents, $cloud = "cos")
-	{
-		try {
-			$filesystemFactory = di(FilesystemFactory::class);
-			$client = $filesystemFactory->get($cloud);
-			$result = $client->write($saveName, $contents);
-			return $result;
-		} catch (\Exception $e) {
-			throw new BusinessException(BusinessErrorCode::PARAMS_UPLOAD_FILE_FAIL, $e->getMessage());
-		}
-	}
-}
-
 
 
 
