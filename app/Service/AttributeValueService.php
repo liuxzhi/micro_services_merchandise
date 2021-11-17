@@ -5,7 +5,9 @@ namespace App\Service;
 
 use App\Contract\AttributeValueServiceInterface;
 
-class AttributeValueService implements AttributeValueServiceInterface
+class AttributeValueService extends AbstractService implements AttributeValueServiceInterface
 {
-
+    public function __construct(){
+        parent::__construct();
+    }
 }

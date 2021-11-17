@@ -5,7 +5,9 @@ namespace App\Service;
 
 use App\Contract\MerchandiseItemAttributeServiceInterface;
 
-class MerchandiseItemService implements MerchandiseItemAttributeServiceInterface
+class MerchandiseItemService extends AbstractService implements MerchandiseItemAttributeServiceInterface
 {
-
+    public function __construct(){
+        parent::__construct();
+    }
 }
