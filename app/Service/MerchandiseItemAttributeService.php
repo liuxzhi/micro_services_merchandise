@@ -6,6 +6,10 @@ use App\Contract\MerchandiseItemAttributeServiceInterface;
 
 class MerchandiseItemAttributeService extends AbstractService implements MerchandiseItemAttributeServiceInterface
 {
+    /**
+     * MerchandiseItemAttributeService constructor.
+     * @throws \Exception
+     */
     public function __construct(){
         parent::__construct();
     }

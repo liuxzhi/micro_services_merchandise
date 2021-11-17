@@ -3,16 +3,18 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-use Hyperf\Database\Model\Model;
 
 abstract class AbstractService
 {
-
     /**
-     * @var Model
+     * @var string
      */
     protected $modelClass = "";
 
+    /**
+     * AbstractService constructor.
+     * @throws \Exception
+     */
     public function __construct()
     {
         if (!$this->modelClass) {
