@@ -71,10 +71,9 @@ if (!function_exists('serviceMap')) {
 
         $dependencies = [];
         foreach ($services as $service) {
-            if(strpos($service, "Abstract") === false) {
+            if (strpos($service, "Abstract") === false) {
                 $dependencies[$spacePrefix . '\\Contract\\' . $service . 'Interface'] = $spacePrefix . '\\Service\\' . $service;
             }
-
         }
 
         return $dependencies;
