@@ -43,12 +43,6 @@ class BusinessErrorCode extends AbstractConstants
 	 */
 	const PARAMS_VALIDATE_APP_FAIL = 10006;
 
-
-	/**
-	 * @Message("上传文件失败")
-	 */
-	const PARAMS_UPLOAD_FILE_FAIL = 10007;
-
 	/**
 	 * @Message("远程HTTP服务错误")
 	 */
