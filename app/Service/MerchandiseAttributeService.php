@@ -4,6 +4,13 @@ declare(strict_types=1);
 namespace App\Service;
 use App\Contract\MerchandiseAttributeServiceInterface;
 
+/**
+ * @method array get()
+ * @method array create()
+ * @method array list()
+ * @method array update()
+ * @method array delete()
+ */
 class MerchandiseAttributeService extends AbstractService implements MerchandiseAttributeServiceInterface
 {
     /**

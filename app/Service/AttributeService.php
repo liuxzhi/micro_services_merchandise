@@ -4,6 +4,13 @@ declare(strict_types=1);
 namespace App\Service;
 use App\Contract\AttributeServiceInterface;
 
+/**
+ * @method array get()
+ * @method array create()
+ * @method array list()
+ * @method array update()
+ * @method array delete()
+ */
 class AttributeService extends AbstractService implements AttributeServiceInterface
 {
     /**

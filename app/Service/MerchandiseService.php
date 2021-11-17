@@ -5,6 +5,13 @@ namespace App\Service;
 
 use App\Contract\MerchandiseServiceInterface;
 
+/**
+ * @method array get()
+ * @method array create()
+ * @method array list()
+ * @method array update()
+ * @method array delete()
+ */
 class MerchandiseService  extends AbstractService implements MerchandiseServiceInterface
 {
     /**
