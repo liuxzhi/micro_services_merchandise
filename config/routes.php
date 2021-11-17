@@ -13,3 +13,4 @@ use Hyperf\HttpServer\Router\Router;
 
 Router::addRoute(['GET', 'POST', 'HEAD'], '/', 'App\Controller\IndexController@index');
 Router::addRoute(['GET', 'POST'], '/merchandise/create', 'App\Controller\MerchandiseController@create');
+Router::addRoute(['GET', 'POST'], '/merchandise/get', 'App\Controller\MerchandiseController@get');
