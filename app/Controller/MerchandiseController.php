@@ -22,12 +22,18 @@ class MerchandiseController extends AbstractController
     {
         // 验证商品创建
         $params = $this->request->all();
-        $params["name"] = "Apple 苹果12 iPhone 12 5G手机";
-        $params["introduction"] = "Apple 苹果12 iPhone 12 5G手机";
-        $params["item_attribute_value"][1] = [1, 2, 3, 4];
-        $params["item_attribute_value"][2] = [5, 6, 7, 8, 9, 10];
-
         return $this->merchandiseHandler->create($params);
+    }
+
+    /**
+     * 获取商品详情
+     */
+    public function get()
+    {
+        $params = $this->request->all();
+        $params['merchandise_id'] = 1;
+        $params['merchandise_item_id'] = 1;
+        return $this->merchandiseHandler->get($params);
     }
 
 }
