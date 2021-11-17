@@ -31,5 +31,7 @@ class Category extends Model
      *
      * @var array
      */
-    protected $casts = ['id' => 'integer', 'parent_id' => 'integer', 'state' => 'integer', 'deleted_at' => 'integer', 'updated_at' => 'datetime', 'created_at' => 'datetime'];
+    protected $casts = ['id' => 'integer', 'parent_id' => 'integer', 'state' => 'integer', 'created_at' => 'integer', 'updated_at' => 'integer', 'deleted_at' => 'integer'];
+
+    protected $dateFormat = 'U';
 }

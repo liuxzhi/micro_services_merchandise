@@ -32,5 +32,7 @@ class Merchandise extends Model
      *
      * @var array
      */
-    protected $casts = ['id' => 'integer', 'state' => 'integer', 'sort' => 'integer', 'deleted_at' => 'integer', 'updated_at' => 'datetime', 'created_at' => 'datetime'];
+    protected $casts = ['id' => 'integer', 'state' => 'integer', 'sort' => 'integer', 'deleted_at' => 'integer', 'created_at' => 'integer', 'updated_at' => 'integer', 'deleted_at' => 'integer'];
+
+    protected $dateFormat = 'U';
 }

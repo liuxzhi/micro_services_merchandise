@@ -26,11 +26,13 @@ class MerchandiseItem extends Model
      *
      * @var array
      */
-    protected $fillable = ['id', 'merchandise_id', 'name', 'image', 'sku_id', 'deleted_at', 'updated_at', 'created_at'];
+    protected $fillable = ['id', 'merchandise_id', 'storage', 'merchandise_no', 'name', 'image', 'sku_id', 'deleted_at', 'updated_at', 'created_at'];
     /**
      * The attributes that should be cast to native types.
      *
      * @var array
      */
-    protected $casts = ['id' => 'integer', 'merchandise_id' => 'integer', 'deleted_at' => 'integer', 'updated_at' => 'datetime', 'created_at' => 'datetime'];
+    protected $casts = ['id' => 'integer', 'merchandise_id' => 'integer', 'storage' => 'integer', 'merchandise_no' => 'string', 'created_at' => 'integer', 'updated_at' => 'integer', 'deleted_at' => 'integer'];
+
+    protected $dateFormat = 'U';
 }
