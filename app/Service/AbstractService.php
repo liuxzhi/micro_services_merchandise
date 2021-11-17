@@ -22,6 +22,7 @@ abstract class AbstractService
             if (!class_exists($modelClass)) {
                 throw new \Exception("model " . $modelClass . "isn't exist");
             }
+            echo $modelClass;
             $this->setModelClass($modelClass);
         }
     }
@@ -47,9 +48,6 @@ abstract class AbstractService
     public function get($params, array $columns = ['*'])
     {
         $model = new $this->modelClass();
-        if (!isset($params['is_delete'])) {
-            $params['is_delete'] = 0;
-        }
 
         $info = $model->select($columns)
             ->where($params)
@@ -72,10 +70,6 @@ abstract class AbstractService
     public function list($params, $columns = ["*"])
     {
         $model = new $this->modelClass();
-        if (!isset($params['is_delete'])) {
-            $params['is_delete'] = 0;
-        }
-
         [$where, $options] = $this->handleParams($params);
         $model = $this->optionWhere($model, $where, $options);
 
@@ -134,7 +128,7 @@ abstract class AbstractService
 
         if ($softDelete) {
             return $model->where(['id' => $id])
-                ->update(['is_delete' => 1]);
+                ->update(['deleted_at' => time()]);
         }
 
         return $model->where(['id' => $id])
