@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 namespace App\Service;
+
 use App\Contract\AttributeServiceInterface;
 
 /**
@@ -17,7 +18,8 @@ class AttributeService extends AbstractService implements AttributeServiceInterf
      * AttributeService constructor.
      * @throws \Exception
      */
-    public function __construct(){
+    public function __construct()
+    {
         parent::__construct();
     }
 
@@ -25,15 +27,20 @@ class AttributeService extends AbstractService implements AttributeServiceInterf
     /**
      * 根据查询条件获取属性值
      *
-     * @param $conditions
-     * @param $options
+     * @param array $conditions
+     * @param array $options
+     * @param array $columns
+     *
      * @return array
      */
-    public function getAttributeListByCondition($conditions=[], $options=[]): array
+    public function getAttributeListByCondition($conditions = [], $options = [], array $columns = ['*']): array
     {
         $model = new $this->modelClass();
-        $data = $this->optionWhere($model, $conditions, $options)->get();
+        $data  = $this->optionWhere($model, $conditions, $options)
+                      ->select($columns)
+                      ->get();
         $data || $data = collect([]);
+
         return $data->toArray();
     }
 }

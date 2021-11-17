@@ -50,8 +50,8 @@ abstract class AbstractService
         $model = new $this->modelClass();
 
         $info = $model->select($columns)
-            ->where($params)
-            ->get();
+                      ->where($params)
+                      ->get();
         if ($info) {
             return $info->toArray();
         }
@@ -74,9 +74,9 @@ abstract class AbstractService
         $model = $this->optionWhere($model, $where, $options);
 
         // 分页参数
-        $perPage = isset($options['perPage']) ? (int)$options['perPage'] : 10;
+        $perPage  = isset($options['perPage']) ? (int)$options['perPage'] : 10;
         $pageName = $options['pageName'] ?? 'page';
-        $page = isset($options['page']) ? (int)$options['page'] : null;
+        $page     = isset($options['page']) ? (int)$options['page'] : null;
 
         // 分页
         $data = $model->paginate($perPage, $columns, $pageName, $page);
@@ -88,9 +88,9 @@ abstract class AbstractService
 
         $default = [
             'page' => [
-                'perPage' => $perPage,
-                'total' => '0',
-                'totalPage' => '0',
+                'perPage'     => $perPage,
+                'total'       => '0',
+                'totalPage'   => '0',
                 'currentPage' => 1,
             ],
             'list' => [],
@@ -108,11 +108,11 @@ abstract class AbstractService
     public function update($params)
     {
         $model = new $this->modelClass();
-        $id = (int)$params['id'];
+        $id    = (int)$params['id'];
         unset($params['id']);
 
         return $model->where(['id' => $id])
-            ->update($params);
+                     ->update($params);
     }
 
     /**
@@ -124,15 +124,15 @@ abstract class AbstractService
     public function delete($params, $softDelete = true)
     {
         $model = new $this->modelClass();
-        $id = (int)$params['id'];
+        $id    = (int)$params['id'];
 
         if ($softDelete) {
             return $model->where(['id' => $id])
-                ->update(['deleted_at' => time()]);
+                         ->update(['deleted_at' => time()]);
         }
 
         return $model->where(['id' => $id])
-            ->delete();
+                     ->delete();
     }
 
 
@@ -167,8 +167,8 @@ abstract class AbstractService
     {
 
         $options = [
-            'perPage' => $params['perPage'] ?? 10,
-            'page' => $params['page'] ?? 1,
+            'perPage'    => $params['perPage'] ?? 10,
+            'page'       => $params['page'] ?? 1,
             'orderByRaw' => $params['orderByRaw'] ?? 'id desc',
         ];
 
@@ -189,9 +189,9 @@ abstract class AbstractService
      */
     protected function handleData(array $dataWithPage): array
     {
-        $data['page']['perPage'] = $dataWithPage['per_page'];
-        $data['page']['total'] = $dataWithPage['total'];
-        $data['page']['totalPage'] = $dataWithPage['last_page'];
+        $data['page']['perPage']     = $dataWithPage['per_page'];
+        $data['page']['total']       = $dataWithPage['total'];
+        $data['page']['totalPage']   = $dataWithPage['last_page'];
         $data['page']['currentPage'] = $dataWithPage['current_page'];
 
         $itemsList = [];
@@ -215,14 +215,13 @@ abstract class AbstractService
     {
         if (!empty($where) && is_array($where)) {
             foreach ($where as $k => $v) {
-
                 if (!is_array($v)) {
                     $model = $model->where($k, $v);
                     continue;
                 }
 
                 if (is_numeric($k)) {
-                    $v[1] = mb_strtoupper($v[1]);
+                    $v[1]    = mb_strtoupper($v[1]);
                     $boolean = isset($v[3]) ? $v[3] : 'and';
                     if (in_array($v[1], ['=', '!=', '<', '<=', '>', '>=', 'LIKE', 'NOT LIKE'])) {
                         $model = $model->where($v[0], $v[1], $v[2], $boolean);
