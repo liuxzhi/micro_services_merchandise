@@ -7,9 +7,12 @@ interface AttributeValueServiceInterface
 {
     /**
      * 根据查询条件获取属性值
+     *
      * @param array $conditions
      * @param array $options
+     * @param array $columns
+     *
      * @return array
      */
-    public function getAttributeValueListByCondition($conditions=[], $options=[]) : array ;
+    public function getAttributeValueListByCondition(array $conditions=[], array $options=[], array $columns = ['*']) : array ;
 }
