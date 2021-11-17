@@ -3,15 +3,56 @@
 declare(strict_types=1);
 
 namespace App\Logic\Merchandise;
-use App\Model\Merchandise;
-use App\Model\MerchandiseAttribute;
-use App\Model\MerchandiseAttributeValue;
-use App\Model\MerchandiseItem;
-use App\Model\MerchandiseItemAttribute;
-use App\Model\MerchandiseItemAttributeValue;
+
+use Hyperf\Di\Annotation\Inject;
+use App\Contract\MerchandiseServiceInterface;
+use App\Contract\MerchandiseAttributeServiceInterface;
+use App\Contract\MerchandiseAttributeValueServiceInterface;
+use App\Contract\MerchandiseItemServiceInterface;
+use App\Contract\MerchandiseItemAttributeServiceInterface;
+use App\Contract\MerchandiseItemAttributeValueServiceInterface;
 
 class MerchandiseHandler
 {
+
+	/**
+	 * @Inject
+	 * @var MerchandiseServiceInterface
+	 */
+	protected $MerchandiseService;
+
+	/**
+	 * @Inject
+	 * @var MerchandiseAttributeServiceInterface
+	 */
+	protected $MerchandiseAttributeService;
+
+	/**
+	 * @Inject
+	 * @var MerchandiseAttributeValueServiceInterface
+	 */
+	protected $MerchandiseAttributeValueService;
+
+	/**
+	 * @Inject
+	 * @var MerchandiseItemServiceInterface
+	 */
+	protected $MerchandiseItemServiceInterface;
+
+
+    /**
+     * @Inject
+     * @var MerchandiseItemAttributeServiceInterface
+     */
+    protected $MerchandiseItemAttributeService;
+
+
+    /**
+     * @Inject
+     * @var MerchandiseItemAttributeValueServiceInterface
+     */
+    protected $MerchandiseItemAttributeValueServiceInterface;
+
 	/**
 	 * 创建商品
 	 * @param $params
@@ -21,12 +62,21 @@ class MerchandiseHandler
 
 	}
 
+	/**
+	 * 更新商品
+	 * @param $params
+	 */
 	public function update($params)
 	{
 
 	}
 
-	public function get($params) {
+	/**
+	 * 获取商品
+	 * @param $params
+	 */
+	public function get($params)
+	{
 
 	}
 
