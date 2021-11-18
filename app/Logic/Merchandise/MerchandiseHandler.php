@@ -16,7 +16,7 @@ use App\Contract\AttributeServiceInterface;
 use App\Contract\AttributeValueServiceInterface;
 use Hyperf\DbConnection\Db;
 
-// TODO : 长业务逻辑代码拆分
+// TODO : 长业务逻辑代码拆分解决商品图片和商品码和sku关系的问题
 class MerchandiseHandler
 {
     /**
@@ -114,7 +114,7 @@ class MerchandiseHandler
 
             foreach ($attributeValueCombinations as $attributeValueCombination) {
                 // 创建单品(SKU)
-                $attributeValueList     = $this->AttributeValueService->getAttributeValueListByCondition([
+                $attributeValueList     = $this->AttributeValueService->getAttributeValueList([
                     [
                         "id",
                         "IN",
@@ -169,20 +169,22 @@ class MerchandiseHandler
     public function get($params)
     {
         $merchandiseId       = $params['merchandise_id'];
+
         $merchandiseInfo     = $this->MerchandiseService->get(['id' => $merchandiseId],
             ['id', 'name', 'introduction'])[0];
-        $merchandiseItemList = $this->MerchandiseItemService->getMerchandiseItemListByCondition(['merchandise_id' => $merchandiseId],
+
+        $merchandiseItemList = $this->MerchandiseItemService->getMerchandiseItemList(['merchandise_id' => $merchandiseId],
             ['orderByRaw' => 'id asc'], ['id', 'merchandise_id', 'merchandise_no', 'storage', 'name', 'image']);
+
         $merchandiseItemId   = $params['item_id'] ?? $merchandiseItemList[0]['id'];
-
-
         $merchandiseInfo['item_id'] = $merchandiseItemId;
+
         // 商品属性列表
-        $merchandiseAttributeList = $this->MerchandiseAttributeService->getMerchandiseAttributeListByCondition(['merchandise_id' => $merchandiseId],
+        $merchandiseAttributeList = $this->MerchandiseAttributeService->getMerchandiseAttributeList(['merchandise_id' => $merchandiseId],
             [], ['id', 'merchandise_id', 'attribute_id']);
 
         $attributeIds  = array_column($merchandiseAttributeList, 'attribute_id');
-        $attributeList = $this->AttributeService->getAttributeListByCondition([['id', "IN", $attributeIds]], [],
+        $attributeList = $this->AttributeService->getAttributeList([['id', "IN", $attributeIds]], [],
             ['id', 'name']);
 
         foreach ($merchandiseAttributeList as &$merchandiseAttribute) {
@@ -195,17 +197,16 @@ class MerchandiseHandler
         unset($merchandiseAttribute);
         $merchandiseInfo['attribute_list'] = $merchandiseAttributeList;
 
-
-        $merchandiseAttributeValueList = $this->MerchandiseAttributeValueService->getMerchandiseAttributeValueListByCondition(['merchandise_id' => $merchandiseId]);
-
+        $merchandiseAttributeValueList = $this->MerchandiseAttributeValueService->getMerchandiseAttributeValueList(['merchandise_id' => $merchandiseId]);
         $attributeValueIds  = array_column($merchandiseAttributeValueList, 'attribute_value_id');
-        $attributeValueList = $this->AttributeValueService->getAttributeValueListByCondition([
+        $attributeValueList = $this->AttributeValueService->getAttributeValueList([
             [
                 'id',
                 "IN",
                 $attributeValueIds
             ]
         ], [], ['id', 'attribute_id', 'value']);
+
         // 商品属性列表
         $merchandiseInfo['attribute_value_list'] = $attributeValueList;
 
@@ -253,8 +254,8 @@ class MerchandiseHandler
         $merchandiseInfo['attribute_value_associated_List'] = $merchandiseAttributeValueAssociatedList;
 
         // 单品信息(item)
-        $merchandiseItemAttributeList      = $this->MerchandiseItemAttributeService->getMerchandiseItemAttributeListByCondition(['merchandise_id' => $merchandiseId]);
-        $merchandiseItemAttributeValueList = $this->MerchandiseItemAttributeValueService->getMerchandiseItemAttributeValueListByCondition(['merchandise_id' => $merchandiseId]);
+        $merchandiseItemAttributeList      = $this->MerchandiseItemAttributeService->getMerchandiseItemAttributeList(['merchandise_id' => $merchandiseId]);
+        $merchandiseItemAttributeValueList = $this->MerchandiseItemAttributeValueService->getMerchandiseItemAttributeValueList(['merchandise_id' => $merchandiseId]);
 
         foreach ($merchandiseItemList as &$merchandiseItem) {
             foreach ($merchandiseItemAttributeList as $merchandiseItemAttribute) {
