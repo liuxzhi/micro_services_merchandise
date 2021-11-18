@@ -24,14 +24,16 @@ class MerchandiseItemAttributeService extends AbstractService implements Merchan
     /**
      * 根据查询条件获取属性值
      *
-     * @param $conditions
-     * @param $options
+     * @param array $conditions
+     * @param array $options
+     * @param array $columns
+     *
      * @return array
      */
-    public function getMerchandiseItemAttributeListByCondition($conditions=[], $options=[]): array
+    public function getMerchandiseItemAttributeListByCondition($conditions=[], $options=[], array $columns = ['*']): array
     {
         $model = new $this->modelClass();
-        $data = $this->optionWhere($model, $conditions, $options)->get();
+        $data = $this->optionWhere($model, $conditions, $options)->select($columns)->get();
         $data || $data = collect([]);
         return $data->toArray();
     }
