@@ -116,8 +116,8 @@ class MerchandiseHandler
 
             foreach ($attributeValueCombinations as $attributeValueCombination) {
 
-                $combinationAttributeValueData = explode(',', $attributeValueCombination);
                 // 创建单品(SKU)
+                $combinationAttributeValueData = explode(',', $attributeValueCombination);
                 $attributeValueList = $this->AttributeValueService->getAttributeValueList([
                     [
                         "id",
@@ -130,12 +130,13 @@ class MerchandiseHandler
                 $itemName               = $params['name'] . " " . implode(" ", $attributeValueNameList);
                 $item                   = ["merchandise_id" => $merchandiseId, "name" => $itemName];
 
-                $itemCartesianInfo = $this->getParamsCartesian($params, $attributeValueCombination);
+                $itemCartesianInfo = $this->getParamsCartesian($params['items'], $attributeValueCombination);
 
                 $item['image'] = $itemCartesianInfo['image'];
                 $item['merchandise_no'] = $itemCartesianInfo['merchandise_no'];
+                $item['storage'] = $itemCartesianInfo['storage'];
                 $item['attribute_value_ids'] = $attributeValueCombination;
-                $item['attribute_ids'] = $this->getAttributeIdFromCombinations($attributeValueList, $combinationAttributeValueData);
+                $item['attribute_ids'] = explode(",", $this->getAttributeIdFromCombinations($attributeValueList, $combinationAttributeValueData));
 
                 $itemResult = $this->MerchandiseItemService->create($item);
                 $itemId     = $itemResult['id'];
@@ -333,8 +334,13 @@ class MerchandiseHandler
 
     /**
      * 获取参数中笛卡尔积对应的值
+     *
+     * @param array  $params
+     * @param string $key
+     *
+     * @return array|mixed
      */
-    protected function getParamsCartesian(array $params, array $key)
+    protected function getParamsCartesian(array $params, string $key)
     {
         if (isset($params[$key])) {
             return $params[$key];
