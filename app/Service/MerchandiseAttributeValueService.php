@@ -28,7 +28,7 @@ class MerchandiseAttributeValueService extends AbstractService implements Mercha
      * @param $options
      * @return array
      */
-    public function getMerchandiseAttributeValueListByCondition($conditions=[], $options=[]): array
+    public function getMerchandiseAttributeValueList($conditions=[], $options=[]): array
     {
         $model = new $this->modelClass();
         $data = $this->optionWhere($model, $conditions, $options)->get();

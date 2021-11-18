@@ -30,7 +30,7 @@ class MerchandiseAttributeService extends AbstractService implements Merchandise
      * @param array $columns
      * @return array
      */
-    public function getMerchandiseAttributeListByCondition(array $conditions=[], array $options=[], array $columns = ['*']): array
+    public function getMerchandiseAttributeList(array $conditions=[], array $options=[], array $columns = ['*']): array
     {
         $model = new $this->modelClass();
         $data = $this->optionWhere($model, $conditions, $options)->select($columns)->get();

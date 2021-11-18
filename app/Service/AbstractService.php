@@ -22,7 +22,7 @@ abstract class AbstractService
             if (!class_exists($modelClass)) {
                 throw new \Exception("model " . $modelClass . "isn't exist");
             }
-            echo $modelClass;
+
             $this->setModelClass($modelClass);
         }
     }
@@ -57,47 +57,6 @@ abstract class AbstractService
         }
 
         return [];
-    }
-
-    /**
-     *  列表查询
-     *
-     * @param $params
-     * @param $columns
-     *
-     * @return array
-     */
-    public function list($params, $columns = ["*"])
-    {
-        $model = new $this->modelClass();
-        [$where, $options] = $this->handleParams($params);
-        $model = $this->optionWhere($model, $where, $options);
-
-        // 分页参数
-        $perPage  = isset($options['perPage']) ? (int)$options['perPage'] : 10;
-        $pageName = $options['pageName'] ?? 'page';
-        $page     = isset($options['page']) ? (int)$options['page'] : null;
-
-        // 分页
-        $data = $model->paginate($perPage, $columns, $pageName, $page);
-        if ($data) {
-            $dataWithPage = $data->toArray();
-
-            return $this->handleData($dataWithPage);
-        }
-
-        $default = [
-            'page' => [
-                'perPage'     => $perPage,
-                'total'       => '0',
-                'totalPage'   => '0',
-                'currentPage' => 1,
-            ],
-            'list' => [],
-        ];
-
-        return $default;
-
     }
 
     /**
@@ -180,19 +139,25 @@ abstract class AbstractService
         return [$where, $options];
     }
 
+
     /**
      * 数据分页处理
      *
      * @param array $dataWithPage
+     * @param int   $pageSize
      *
      * @return array
      */
-    protected function handleData(array $dataWithPage): array
+    protected function handlePagedData(array $dataWithPage, int $pageSize): array
     {
-        $data['page']['perPage']     = $dataWithPage['per_page'];
-        $data['page']['total']       = $dataWithPage['total'];
-        $data['page']['totalPage']   = $dataWithPage['last_page'];
-        $data['page']['currentPage'] = $dataWithPage['current_page'];
+        if (!$dataWithPage) {
+            return $this->getDefaultPagedData($pageSize);
+        }
+
+        $data['page']['pageSize']  = $dataWithPage['per_page'];
+        $data['page']['total']     = $dataWithPage['total'];
+        $data['page']['totalPage'] = $dataWithPage['last_page'];
+        $data['page']['page']      = $dataWithPage['current_page'];
 
         $itemsList = [];
         foreach ($dataWithPage['data'] as $key => $items) {
@@ -206,15 +171,15 @@ abstract class AbstractService
 
     /**
      * @param       $model
-     * @param array $where
+     * @param array $conditions
      * @param array $options
      *
      * @return static
      */
-    public function optionWhere($model, array $where, array $options = [])
+    public function optionWhere($model, array $conditions, array $options = [])
     {
-        if (!empty($where) && is_array($where)) {
-            foreach ($where as $k => $v) {
+        if (!empty($conditions) && is_array($conditions)) {
+            foreach ($conditions as $k => $v) {
                 if (!is_array($v)) {
                     $model = $model->where($k, $v);
                     continue;
@@ -244,4 +209,27 @@ abstract class AbstractService
 
         return $model;
     }
+
+    /**
+     * 获取分页为空时的默认数据
+     *
+     * @param $pageSize
+     *
+     * @return array
+     */
+    protected function getDefaultPagedData($pageSize)
+    {
+        $defaultPageData = [
+            'page' => [
+                'pageSize'  => $pageSize,
+                'total'     => '0',
+                'totalPage' => '0',
+                'page'      => 1,
+            ],
+            'list' => [],
+        ];
+
+        return $defaultPageData;
+    }
+
 }

@@ -31,7 +31,7 @@ class MerchandiseItemService extends AbstractService implements MerchandiseItemS
      *
      * @return array
      */
-    public function getMerchandiseItemListByCondition($conditions=[], $options=[], array $columns = ['*']): array
+    public function getMerchandiseItemList($conditions=[], $options=[], array $columns = ['*']): array
     {
         $model = new $this->modelClass();
         $data = $this->optionWhere($model, $conditions, $options)->select($columns)->get();

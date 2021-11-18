@@ -29,7 +29,7 @@ class CategoryService extends AbstractService implements CategoryServiceInterfac
      * @param $options
      * @return array
      */
-    public function getCategoryListByCondition($conditions=[], $options=[]): array
+    public function getCategoryList($conditions=[], $options=[]): array
     {
         $model = new $this->modelClass();
         $data = $this->optionWhere($model, $conditions, $options)->get();

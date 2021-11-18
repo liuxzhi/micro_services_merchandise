@@ -33,14 +33,31 @@ class AttributeService extends AbstractService implements AttributeServiceInterf
      *
      * @return array
      */
-    public function getAttributeListByCondition($conditions = [], $options = [], array $columns = ['*']): array
+    public function getAttributeList(array $conditions = [], array $options = [], array $columns = ['*']): array
     {
-        $model = new $this->modelClass();
-        $data  = $this->optionWhere($model, $conditions, $options)
-                      ->select($columns)
-                      ->get();
+        $model              = new $this->modelClass();
+        $modelWithCondition = $this->optionWhere($model, $conditions, $options);
+
+        // 分页数据
+        if (isset($options['page'])) {
+
+            $data = [];
+            $pageSize     = isset($options['pageSize']) ? (int)$options['pageSize'] : 10;
+            $pageName     = 'page';
+            $page         = isset($options['page']) ? (int)$options['page'] : 1;
+            $dataWithPage = $model->paginate($pageSize, $columns, $pageName, $page);
+
+            if ($dataWithPage) {
+                $data = $dataWithPage->toArray();
+            }
+            return $this->handlePagedData($data, $pageSize);
+        }
+
+        // 全量数据
+        $data = $modelWithCondition->select($columns)->get();
         $data || $data = collect([]);
 
         return $data->toArray();
+
     }
 }

@@ -29,7 +29,7 @@ class MerchandiseItemAttributeValueService extends AbstractService implements Me
      * @param $options
      * @return array
      */
-    public function getMerchandiseItemAttributeValueListByCondition($conditions=[], $options=[]): array
+    public function getMerchandiseItemAttributeValueList($conditions=[], $options=[]): array
     {
         $model = new $this->modelClass();
         $data = $this->optionWhere($model, $conditions, $options)->get();
