@@ -83,11 +83,11 @@ class MerchandiseHandler
             // 创建商品(SPU)
             $merchandiseData   = ['name' => $params['name'], 'introduction' => $params['introduction']];
             $merchandiseResult = $this->MerchandiseService->create($merchandiseData);
+
+            // 创建商品属性和商品属性值
             $merchandiseId     = $merchandiseResult['id'];
             $attributes        = array_keys($params['item_attribute_value']);
 
-
-            // 创建商品属性和商品属性值
             $formattedAttributes = [];
             foreach ($attributes as $attribute) {
                 $formattedAttribute = ["merchandise_id" => $merchandiseId, "attribute_id" => $attribute];
@@ -113,7 +113,6 @@ class MerchandiseHandler
             $attributeValueCombinations = cartesian($attributeValues);
 
             foreach ($attributeValueCombinations as $attributeValueCombination) {
-
                 // 创建单品(SKU)
                 $attributeValueList     = $this->AttributeValueService->getAttributeValueListByCondition([
                     [
@@ -161,7 +160,7 @@ class MerchandiseHandler
     }
 
     /**
-     * 获取商品
+     * 获取商品详情SPU 和 SKU列表
      *
      * @param $params
      *
@@ -169,10 +168,12 @@ class MerchandiseHandler
      */
     public function get($params)
     {
-        $merchandiseId     = $params['merchandise_id'];
-        $merchandiseInfo = $this->MerchandiseService->get(['id' => $merchandiseId], ['id', 'name', 'introduction'])[0];
-        $merchandiseItemList  = $this->MerchandiseItemService->getMerchandiseItemListByCondition([ 'merchandise_id' => $merchandiseId], ['orderByRaw' => 'id asc'], ['id', 'merchandise_id', 'merchandise_no', 'storage', 'name', 'image']);
-        $merchandiseItemId = $params['item_id'] ?? $merchandiseItemList[0]['id'];
+        $merchandiseId       = $params['merchandise_id'];
+        $merchandiseInfo     = $this->MerchandiseService->get(['id' => $merchandiseId],
+            ['id', 'name', 'introduction'])[0];
+        $merchandiseItemList = $this->MerchandiseItemService->getMerchandiseItemListByCondition(['merchandise_id' => $merchandiseId],
+            ['orderByRaw' => 'id asc'], ['id', 'merchandise_id', 'merchandise_no', 'storage', 'name', 'image']);
+        $merchandiseItemId   = $params['item_id'] ?? $merchandiseItemList[0]['id'];
 
 
         $merchandiseInfo['item_id'] = $merchandiseItemId;
@@ -180,8 +181,9 @@ class MerchandiseHandler
         $merchandiseAttributeList = $this->MerchandiseAttributeService->getMerchandiseAttributeListByCondition(['merchandise_id' => $merchandiseId],
             [], ['id', 'merchandise_id', 'attribute_id']);
 
-        $attributeIds             = array_column($merchandiseAttributeList, 'attribute_id');
-        $attributeList            = $this->AttributeService->getAttributeListByCondition([['id', "IN", $attributeIds]], [], ['id', 'name']);
+        $attributeIds  = array_column($merchandiseAttributeList, 'attribute_id');
+        $attributeList = $this->AttributeService->getAttributeListByCondition([['id', "IN", $attributeIds]], [],
+            ['id', 'name']);
 
         foreach ($merchandiseAttributeList as &$merchandiseAttribute) {
             foreach ($attributeList as $attribute) {
@@ -196,8 +198,14 @@ class MerchandiseHandler
 
         $merchandiseAttributeValueList = $this->MerchandiseAttributeValueService->getMerchandiseAttributeValueListByCondition(['merchandise_id' => $merchandiseId]);
 
-        $attributeValueIds = array_column($merchandiseAttributeValueList, 'attribute_value_id');
-        $attributeValueList = $this->AttributeValueService->getAttributeValueListByCondition([['id', "IN", $attributeValueIds]], [], ['id', 'attribute_id', 'value']);
+        $attributeValueIds  = array_column($merchandiseAttributeValueList, 'attribute_value_id');
+        $attributeValueList = $this->AttributeValueService->getAttributeValueListByCondition([
+            [
+                'id',
+                "IN",
+                $attributeValueIds
+            ]
+        ], [], ['id', 'attribute_id', 'value']);
         // 商品属性列表
         $merchandiseInfo['attribute_value_list'] = $attributeValueList;
 
@@ -225,7 +233,7 @@ class MerchandiseHandler
             $merchandiseAttributeValueAssociatedData = [];
 
             $merchandiseAttributeValueAssociatedData['attribute_id'] = $attributeId;
-            $name = "";
+            $name                                                    = "";
             foreach ($merchandiseAttributeList as $merchandiseAttribute) {
                 if ($attributeId == $merchandiseAttribute['attribute_id']) {
                     $name = $merchandiseAttribute['name'];
@@ -235,12 +243,12 @@ class MerchandiseHandler
 
             foreach ($itemsMerchandiseAttributeValue as $valueItem) {
                 foreach ($attributeValueList as $attributeValue) {
-                    if($attributeValue['id'] == $valueItem ) {
+                    if ($attributeValue['id'] == $valueItem) {
                         $merchandiseAttributeValueAssociatedData['values'][] = $attributeValue;
                     }
                 }
             }
-            $merchandiseAttributeValueAssociatedList[]  = $merchandiseAttributeValueAssociatedData;
+            $merchandiseAttributeValueAssociatedList[] = $merchandiseAttributeValueAssociatedData;
         }
         $merchandiseInfo['attribute_value_associated_List'] = $merchandiseAttributeValueAssociatedList;
 
@@ -250,16 +258,15 @@ class MerchandiseHandler
 
         foreach ($merchandiseItemList as &$merchandiseItem) {
             foreach ($merchandiseItemAttributeList as $merchandiseItemAttribute) {
-                if($merchandiseItem['id'] == $merchandiseItemAttribute['item_id']) {
+                if ($merchandiseItem['id'] == $merchandiseItemAttribute['item_id']) {
                     foreach ($merchandiseItemAttributeValueList as $merchandiseItemAttributeValue) {
-                        if ($merchandiseItemAttributeValue['item_id'] == $merchandiseItemAttribute['item_id']
-                            && $merchandiseItemAttribute['attribute_id'] == $merchandiseItemAttributeValue['attribute_id']
-                        ) {
+                        if ($merchandiseItemAttributeValue['item_id'] == $merchandiseItemAttribute['item_id'] && $merchandiseItemAttribute['attribute_id'] == $merchandiseItemAttributeValue['attribute_id']) {
                             $merchandiseItem['item_attribute_value'][$merchandiseItemAttribute['attribute_id']] = $merchandiseItemAttributeValue['attribute_value_id'];
                         }
 
                     }
-                    $merchandiseItem['item_attribute_value_ids'] = implode(',', $merchandiseItem['item_attribute_value']);
+                    $merchandiseItem['item_attribute_value_ids'] = implode(',',
+                        $merchandiseItem['item_attribute_value']);
 
                 }
             }
