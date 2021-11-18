@@ -19,6 +19,12 @@ use Hyperf\Constants\Annotation\Constants;
  */
 class ErrorCode extends AbstractConstants
 {
+
+    /**
+     * @Message("Success ")
+     */
+    public const SUCCESS = 0;
+
     /**
      * @Message("Server Error！")
      */
