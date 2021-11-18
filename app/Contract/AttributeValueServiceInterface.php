@@ -14,5 +14,5 @@ interface AttributeValueServiceInterface
      *
      * @return array
      */
-    public function getAttributeValueListByCondition(array $conditions=[], array $options=[], array $columns = ['*']) : array ;
+    public function getAttributeValueList(array $conditions=[], array $options=[], array $columns = ['*']) : array ;
 }

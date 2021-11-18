@@ -12,5 +12,5 @@ interface MerchandiseItemServiceInterface
      * @param array $columns
      * @return array
      */
-    public function getMerchandiseItemListByCondition(array $conditions=[], array $options=[], array $columns = ['*']): array;
+    public function getMerchandiseItemList(array $conditions=[], array $options=[], array $columns = ['*']): array;
 }
