@@ -126,12 +126,12 @@ abstract class AbstractService
     {
 
         $options = [
-            'perPage'    => $params['perPage'] ?? 10,
+            'pageSize'    => $params['pageSize'] ?? 10,
             'page'       => $params['page'] ?? 1,
             'orderByRaw' => $params['orderByRaw'] ?? 'id desc',
         ];
 
-        unset($params['perPage']);
+        unset($params['pageSize']);
         unset($params['page']);
         unset($params['orderByRaw']);
         $where = !empty($params) ? $params : [];
