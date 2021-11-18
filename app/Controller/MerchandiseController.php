@@ -5,6 +5,7 @@ namespace App\Controller;
 
 use Hyperf\Di\Annotation\Inject;
 use App\Logic\Merchandise\MerchandiseHandler;
+use App\Constants\ErrorCode;
 
 class MerchandiseController extends AbstractController
 {
@@ -22,7 +23,7 @@ class MerchandiseController extends AbstractController
     {
         // 验证商品创建
         $params = $this->request->all();
-        return $this->merchandiseHandler->create($params);
+        return apiReturn(ErrorCode::SUCCESS, '', $this->merchandiseHandler->create($params));
     }
 
     /**
@@ -31,9 +32,7 @@ class MerchandiseController extends AbstractController
     public function get()
     {
         $params = $this->request->all();
-        $params['merchandise_id'] = 1;
-        $params['merchandise_item_id'] = 1;
-        return $this->merchandiseHandler->get($params);
+        return apiReturn(ErrorCode::SUCCESS, '',$this->merchandiseHandler->get($params));
     }
 
 }

@@ -3,13 +3,6 @@ declare(strict_types=1);
 
 use Hyperf\ExceptionHandler\Formatter\FormatterInterface;
 use Hyperf\Utils\ApplicationContext;
-use TencentCloud\Sms\V20210111\SmsClient;
-use TencentCloud\Sms\V20210111\Models\SendSmsRequest;
-use TencentCloud\Common\Exception\TencentCloudSDKException;
-use TencentCloud\Common\Credential;
-use App\Exception\BusinessException;
-use App\Constants\BusinessErrorCode;
-use Hyperf\Filesystem\FilesystemFactory;
 
 
 if (!function_exists('di')) {
@@ -37,7 +30,9 @@ if (!function_exists('di')) {
 if (!function_exists('readPathFiles')) {
     /**
      * 取出某目录下所有php文件的文件名.
+     *
      * @param string $path 文件夹目录
+     *
      * @return array 文件名
      */
     function readPathFiles(string $path): array
@@ -54,6 +49,7 @@ if (!function_exists('readPathFiles')) {
             }
             $data[] = preg_replace('/(\w+)\.php/', '$1', $file);
         }
+
         return $data;
     }
 }
@@ -66,7 +62,7 @@ if (!function_exists('readPathFiles')) {
 if (!function_exists('serviceMap')) {
     function serviceMap(string $path = 'app'): array
     {
-        $services = readPathFiles(BASE_PATH . '/' . $path . '/Service');
+        $services    = readPathFiles(BASE_PATH . '/' . $path . '/Service');
         $spacePrefix = ucfirst($path);
 
         $dependencies = [];
@@ -84,6 +80,7 @@ if (!function_exists('serviceMap')) {
 if (!function_exists('format_throwable')) {
     /**
      * @param Throwable $throwable
+     *
      * @return string
      * @throws TypeError
      * @throws \Psr\Container\ContainerExceptionInterface
@@ -91,7 +88,9 @@ if (!function_exists('format_throwable')) {
      */
     function format_throwable(Throwable $throwable): string
     {
-        return di()->get(FormatterInterface::class)->format($throwable);
+        return di()
+            ->get(FormatterInterface::class)
+            ->format($throwable);
     }
 }
 
@@ -99,7 +98,9 @@ if (!function_exists('format_throwable')) {
 if (!function_exists('cartesian')) {
     /**
      * 计算多个集合的笛卡尔积
+     *
      * @param $sets
+     *
      * @return array
      */
     function cartesian($sets)
@@ -124,6 +125,16 @@ if (!function_exists('cartesian')) {
         }
 
         return $result;
+    }
+}
+
+if(!function_exists('apiReturn')) {
+    function apiReturn(int $code = 0, string $message = "", array $body = []){
+        return [
+            'code' => $code,
+            'message' => $message,
+            'body' => (object)$body
+        ];
     }
 }
 
