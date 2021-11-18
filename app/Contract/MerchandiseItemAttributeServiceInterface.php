@@ -5,5 +5,12 @@ namespace App\Contract;
 
 interface MerchandiseItemAttributeServiceInterface
 {
-
+    /**
+     * @param array $conditions
+     * @param array $options
+     * @param array $columns
+     *
+     * @return array
+     */
+    public function getMerchandiseItemAttributeListByCondition($conditions=[], $options=[], array $columns = ['*']) : array;
 }
