@@ -16,6 +16,7 @@ use App\Contract\AttributeServiceInterface;
 use App\Contract\AttributeValueServiceInterface;
 use Hyperf\DbConnection\Db;
 
+// TODO : 长业务逻辑代码拆分
 class MerchandiseHandler
 {
     /**
@@ -169,9 +170,11 @@ class MerchandiseHandler
     public function get($params)
     {
         $merchandiseId     = $params['merchandise_id'];
-        $merchandiseItemId = $params['item_id'] ;
-
         $merchandiseInfo = $this->MerchandiseService->get(['id' => $merchandiseId], ['id', 'name', 'introduction'])[0];
+        $merchandiseItemList  = $this->MerchandiseItemService->getMerchandiseItemListByCondition([ 'merchandise_id' => $merchandiseId], ['orderByRaw' => 'id asc'], ['id', 'merchandise_id', 'merchandise_no', 'storage', 'name', 'image']);
+        $merchandiseItemId = $params['item_id'] ?? $merchandiseItemList[0]['id'];
+
+
         $merchandiseInfo['item_id'] = $merchandiseItemId;
         // 商品属性列表
         $merchandiseAttributeList = $this->MerchandiseAttributeService->getMerchandiseAttributeListByCondition(['merchandise_id' => $merchandiseId],
@@ -242,7 +245,6 @@ class MerchandiseHandler
         $merchandiseInfo['attribute_value_associated_List'] = $merchandiseAttributeValueAssociatedList;
 
         // 单品信息(item)
-        $merchandiseItemList  = $this->MerchandiseItemService->getMerchandiseItemListByCondition([ 'merchandise_id' => $merchandiseId], [], ['id', 'merchandise_id', 'merchandise_no', 'storage', 'name', 'image']);
         $merchandiseItemAttributeList      = $this->MerchandiseItemAttributeService->getMerchandiseItemAttributeListByCondition(['merchandise_id' => $merchandiseId]);
         $merchandiseItemAttributeValueList = $this->MerchandiseItemAttributeValueService->getMerchandiseItemAttributeValueListByCondition(['merchandise_id' => $merchandiseId]);
 
@@ -264,7 +266,7 @@ class MerchandiseHandler
 
         }
         unset($merchandiseItem);
-        // 处理默认选中的问题
+        // 处理默认选中的问题 TODO
 
         $merchandiseInfo['item_list'] = $merchandiseItemList;
 
@@ -272,6 +274,7 @@ class MerchandiseHandler
     }
 
     /**
+     * // TODO 商品去重保存
      * 更新商品
      *
      * @param $params
