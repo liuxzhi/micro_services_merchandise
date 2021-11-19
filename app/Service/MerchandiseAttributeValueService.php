@@ -30,7 +30,7 @@ class MerchandiseAttributeValueService extends AbstractService implements Mercha
      */
     public function getMerchandiseAttributeValueList($conditions=[], $options=[]): array
     {
-        $model = new $this->modelClass();
+        $model = $this->getModelObject();;
         $data = $this->optionWhere($model, $conditions, $options)->get();
         $data || $data = collect([]);
         return $data->toArray();

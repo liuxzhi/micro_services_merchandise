@@ -33,7 +33,7 @@ class CategoryService extends AbstractService implements CategoryServiceInterfac
      */
     public function getCategoryList(array $conditions=[], array $options=[], array $columns= ['*']): array
     {
-        $model = new $this->modelClass();
+        $model = $this->getModelObject();;
         $data = $this->optionWhere($model, $conditions, $options)->select($columns)->get();
         $data || $data = collect([]);
         return $data->toArray();

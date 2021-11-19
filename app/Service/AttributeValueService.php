@@ -33,7 +33,7 @@ class AttributeValueService extends AbstractService implements AttributeValueSer
      */
     public function getAttributeValueList($conditions=[], $options=[], array $columns = ['*']): array
     {
-        $model = new $this->modelClass();
+        $model = $this->getModelObject();
         $data = $this->optionWhere($model, $conditions, $options)->select($columns)->get();
         $data || $data = collect([]);
         return $data->toArray();

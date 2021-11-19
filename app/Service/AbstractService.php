@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use Hyperf\DbConnection\Model\Model;
+
 
 abstract class AbstractService
 {
@@ -19,8 +21,13 @@ abstract class AbstractService
     {
         if (!$this->modelClass) {
             $modelClass = str_replace(['\Service', 'Service'], ['\Model', ''], get_class($this));
+
             if (!class_exists($modelClass)) {
                 throw new \Exception("model " . $modelClass . "isn't exist");
+            }
+
+            if (!$modelClass instanceof Model) {
+                throw new \Exception("model class must be subclass of Hyperf\DbConnection\Model\Model");
             }
 
             $this->setModelClass($modelClass);
@@ -34,7 +41,7 @@ abstract class AbstractService
      */
     public function create($params)
     {
-        $model = new $this->modelClass();
+        $model = $this->getModelObject();
 
         return $model->create($params);
     }
@@ -47,7 +54,7 @@ abstract class AbstractService
      */
     public function get($params, array $columns = ['*'])
     {
-        $model = new $this->modelClass();
+        $model = $this->getModelObject();
 
         $info = $model->select($columns)
                       ->where($params)
@@ -66,7 +73,7 @@ abstract class AbstractService
      */
     public function update($params)
     {
-        $model = new $this->modelClass();
+        $model = $this->getModelObject();
         $id    = (int)$params['id'];
         unset($params['id']);
 
@@ -82,7 +89,7 @@ abstract class AbstractService
      */
     public function delete($params, $softDelete = true)
     {
-        $model = new $this->modelClass();
+        $model = $this->getModelObject();
         $id    = (int)$params['id'];
 
         if ($softDelete) {
@@ -126,7 +133,7 @@ abstract class AbstractService
     {
 
         $options = [
-            'pageSize'    => $params['pageSize'] ?? 10,
+            'pageSize'   => $params['pageSize'] ?? 10,
             'page'       => $params['page'] ?? 1,
             'orderByRaw' => $params['orderByRaw'] ?? 'id desc',
         ];
@@ -230,6 +237,55 @@ abstract class AbstractService
         ];
 
         return $defaultPageData;
+    }
+
+
+    /**
+     * 获取列表数据
+     *
+     * @param array $conditions
+     * @param array $options
+     * @param array $columns
+     *
+     * @return array
+     */
+    protected function getList(array $conditions = [], array $options = [], array $columns = ['*'])
+    {
+        $model              = $this->getModelObject();
+        $modelWithCondition = $this->optionWhere($model, $conditions, $options);
+
+        // 分页数据
+        if (isset($options['page'])) {
+
+            $data         = [];
+            $pageSize     = isset($options['pageSize']) ? (int)$options['pageSize'] : 10;
+            $pageName     = 'page';
+            $page         = isset($options['page']) ? (int)$options['page'] : 1;
+            $dataWithPage = $model->paginate($pageSize, $columns, $pageName, $page);
+
+            if ($dataWithPage) {
+                $data = $dataWithPage->toArray();
+            }
+
+            return $this->handlePagedData($data, $pageSize);
+        }
+
+        // 全量数据
+        $data = $modelWithCondition->select($columns)
+                                   ->get();
+        $data || $data = collect([]);
+
+        return $data->toArray();
+    }
+
+
+    /**
+     * 获取model对象
+     * @return mixed
+     */
+    protected function getModelObject()
+    {
+        return $model = new ($this->getModelClass())();
     }
 
 }
