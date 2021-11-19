@@ -33,7 +33,7 @@ class MerchandiseItemService extends AbstractService implements MerchandiseItemS
      */
     public function getMerchandiseItemList($conditions=[], $options=[], array $columns = ['*']): array
     {
-        $model = $this->getModelObject();;
+        $model = $this->getModelObject();
         $data = $this->optionWhere($model, $conditions, $options)->select($columns)->get();
         $data || $data = collect([]);
         return $data->toArray();

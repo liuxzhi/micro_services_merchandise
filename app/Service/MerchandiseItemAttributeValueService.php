@@ -31,7 +31,7 @@ class MerchandiseItemAttributeValueService extends AbstractService implements Me
      */
     public function getMerchandiseItemAttributeValueList($conditions=[], $options=[]): array
     {
-        $model = $this->getModelObject();;
+        $model = $this->getModelObject();
         $data = $this->optionWhere($model, $conditions, $options)->get();
         $data || $data = collect([]);
         return $data->toArray();

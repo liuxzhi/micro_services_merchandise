@@ -26,7 +26,7 @@ abstract class AbstractService
                 throw new \Exception("model " . $modelClass . "isn't exist");
             }
 
-            if (!$modelClass instanceof Model) {
+            if (!is_subclass_of($modelClass, Model::class)) {
                 throw new \Exception("model class must be subclass of Hyperf\DbConnection\Model\Model");
             }
 
@@ -103,25 +103,6 @@ abstract class AbstractService
 
 
     /**
-     * 获取操作的模型名称
-     * @return \Hyperf\Database\Model\Model
-     */
-    protected function getModelClass()
-    {
-        return $this->modelClass;
-    }
-
-    /**
-     * 设置操作的模型名称
-     *
-     * @param $className
-     */
-    protected function setModelClass($className)
-    {
-        $this->modelClass = $className;
-    }
-
-    /**
      * 处理参数.
      *
      * @param array $params 接受参数
@@ -155,7 +136,7 @@ abstract class AbstractService
      *
      * @return array
      */
-    protected function handlePagedData(array $dataWithPage, int $pageSize): array
+    public function handlePagedData(array $dataWithPage, int $pageSize = 10): array
     {
         if (!$dataWithPage) {
             return $this->getDefaultPagedData($pageSize);
@@ -186,6 +167,7 @@ abstract class AbstractService
     public function optionWhere($model, array $conditions, array $options = [])
     {
         if (!empty($conditions) && is_array($conditions)) {
+
             foreach ($conditions as $k => $v) {
                 if (!is_array($v)) {
                     $model = $model->where($k, $v);
@@ -210,6 +192,7 @@ abstract class AbstractService
                     $model = $model->whereIn($k, $v);
                 }
             }
+
         }
 
         isset($options['orderByRaw']) && $model = $model->orderByRaw($options['orderByRaw']);
@@ -273,6 +256,7 @@ abstract class AbstractService
         // 全量数据
         $data = $modelWithCondition->select($columns)
                                    ->get();
+
         $data || $data = collect([]);
 
         return $data->toArray();
@@ -280,12 +264,31 @@ abstract class AbstractService
 
 
     /**
+     * 获取操作的模型名称
+     * @return \Hyperf\Database\Model\Model
+     */
+    protected function getModelClass()
+    {
+        return $this->modelClass;
+    }
+
+    /**
+     * 设置操作的模型名称
+     *
+     * @param $className
+     */
+    protected function setModelClass($className)
+    {
+        $this->modelClass = $className;
+    }
+
+    /**
      * 获取model对象
      * @return mixed
      */
-    protected function getModelObject()
+    public function getModelObject()
     {
-        return $model = new ($this->getModelClass())();
+        return $model = new $this->modelClass ();
     }
 
 }
