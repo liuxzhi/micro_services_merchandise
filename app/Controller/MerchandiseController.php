@@ -35,4 +35,14 @@ class MerchandiseController extends AbstractController
         return apiReturn(ErrorCode::SUCCESS, '',$this->merchandiseHandler->get($params));
     }
 
+    /**
+     * 获取商品和单品关联关系列表
+     * @return mixed
+     */
+    public function merchandiseAssociatedMerchandiseItemsList()
+    {
+        $params = $this->request->all();
+        return $this->merchandiseHandler->getMerchandiseAssociatedMerchandiseItemsList($params);
+    }
+
 }
