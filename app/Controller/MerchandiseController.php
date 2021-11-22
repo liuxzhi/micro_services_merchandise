@@ -42,7 +42,18 @@ class MerchandiseController extends AbstractController
     public function merchandiseAssociatedMerchandiseItemsList()
     {
         $params = $this->request->all();
-        return $this->merchandiseHandler->getMerchandiseAssociatedMerchandiseItemsList($params);
+        $columns = [
+            'merchandise.id',
+            'merchandise.name',
+            'merchandise.introduction',
+            'merchandise_item.id as item_id',
+            'merchandise_item.name as item_name',
+            'attribute_ids',
+            'attribute_value_ids',
+            'storage',
+            'image'
+        ];
+        return $this->merchandiseHandler->getMerchandiseAssociatedMerchandiseItemsList($params, $columns);
     }
 
 }

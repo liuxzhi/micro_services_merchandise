@@ -193,18 +193,6 @@ class MerchandiseHandler
         $pageName = 'page';
         $page     = isset($options['page']) ? (int)$params['page'] : 1;
 
-        $columns = [
-            'merchandise.id',
-            'merchandise.name',
-            'merchandise.introduction',
-            'merchandise_item.id as item_id',
-            'merchandise_item.name as item_name',
-            'attribute_ids',
-            'attribute_value_ids',
-            'storage',
-            'image'
-        ];
-
         $merchandiseInfo = $merchandiseModel->where(['merchandise.id' => $params['id']])
                                             ->join("merchandise_item", "merchandise.id", "=",
                                                 "merchandise_item.merchandise_id", 'left')
@@ -226,12 +214,46 @@ class MerchandiseHandler
 
         $merchandiseInfo = $this->MerchandiseService->get(['id' => $merchandiseId], ['id', 'name', 'introduction'])[0];
 
-        $merchandiseItemList = $this->MerchandiseItemService->getMerchandiseItemList(['merchandise_id' => $merchandiseId],
+        $itemList = $this->MerchandiseItemService->getMerchandiseItemList(['merchandise_id' => $merchandiseId],
             ['orderByRaw' => 'id asc'], ['id', 'merchandise_id', 'merchandise_no', 'storage', 'name', 'image', 'attribute_ids', 'attribute_value_ids']);
 
-        $merchandiseItemId          = $params['item_id'] ?? $merchandiseItemList[0]['id'];
+        $merchandiseItemId          = $params['item_id'] ?? $itemList[0]['id'];
         $merchandiseInfo['item_id'] = $merchandiseItemId;
 
+        $merchandiseAttributeValueAssociatedList = $this->getMerchandiseAttributeValueAssociatedList($merchandiseItemId);
+
+        // 单品信息(item)
+        $merchandiseItemList = $this->formatMerchandiseItemList($itemList, $merchandiseItemId);
+
+        // 获取选中的属性值
+        $itemCheckedAttributeValue = $this->getCheckedAttributeValue($merchandiseItemList);
+        $this->doCheckedAttributeValue($merchandiseAttributeValueAssociatedList, $itemCheckedAttributeValue);
+
+        $merchandiseInfo['attribute_value_associated_list'] = $merchandiseAttributeValueAssociatedList;
+        $merchandiseInfo['item_list'] = $merchandiseItemList;
+
+        return $merchandiseInfo;
+    }
+
+    /**
+     * 更新商品
+     *
+     * @param $params
+     */
+    public function update($params)
+    {
+
+    }
+
+    /**
+     * 获取商品属性和属性值关联关系
+     *
+     * @param $merchandiseId
+     *
+     * @return array
+     */
+    protected function getMerchandiseAttributeValueAssociatedList($merchandiseId)
+    {
         // 商品属性列表
         $merchandiseAttributeList = $this->MerchandiseAttributeService->getMerchandiseAttributeList(['merchandise_id' => $merchandiseId],
             [], ['id', 'merchandise_id', 'attribute_id']);
@@ -303,23 +325,34 @@ class MerchandiseHandler
             }
             $merchandiseAttributeValueAssociatedList[] = $merchandiseAttributeValueAssociatedData;
         }
-        $merchandiseInfo['attribute_value_associated_List'] = $merchandiseAttributeValueAssociatedList;
 
-        // 单品信息(item)
-        $itemCheckedAttributeValue         = [];
+        return $merchandiseAttributeValueAssociatedList;
+
+    }
+
+    /**
+     * 获取商品商品单品列表
+     * @param $merchandiseItemList
+     * @param $merchandiseItemId
+     *
+     * @return mixed
+     */
+    protected function formatMerchandiseItemList($merchandiseItemList, $merchandiseItemId)
+    {
+
         foreach ($merchandiseItemList as &$merchandiseItem) {
 
             $itemsAttributeIds = explode(",", $merchandiseItem['attribute_ids']);
             $itemsAttributeValueIds =  explode(",", $merchandiseItem['attribute_value_ids']);
+
             foreach ($itemsAttributeIds as $k => $itemsAttributeId) {
                 $merchandiseItem['item_attribute_value'][$itemsAttributeId] = $itemsAttributeValueIds[$k];
             }
             $merchandiseItem['item_attribute_value_ids'] = implode(',',
-                        $merchandiseItem['item_attribute_value']);
+                $merchandiseItem['item_attribute_value']);
 
             if ($merchandiseItem['id'] == $merchandiseItemId) {
                 $merchandiseItem['is_checked'] = 1;
-                $itemCheckedAttributeValue     = $merchandiseItem['item_attribute_value'];
             } else {
                 $merchandiseItem['is_checked'] = 0;
             }
@@ -327,30 +360,46 @@ class MerchandiseHandler
         }
         unset($merchandiseItem);
 
+        return $merchandiseItemList;
+
+    }
+
+    /**
+     * 获取选中的属性值
+     * @param $merchandiseItemList
+     *
+     * @return array
+     */
+    protected function getCheckedAttributeValue($merchandiseItemList)
+    {
+        $itemCheckedAttributeValue         = [];
+        foreach ($merchandiseItemList as $merchandiseItem) {
+            if ($merchandiseItem['is_check'] == 1) {
+                $itemCheckedAttributeValue    = $merchandiseItem['item_attribute_value'];
+            }
+        }
+
+        return $itemCheckedAttributeValue;
+    }
+
+    /**
+     *  选中的属性值
+     * @param $merchandiseAttributeValueAssociatedList
+     * @param $itemCheckedAttributeValue
+     */
+    protected function doCheckedAttributeValue(&$merchandiseAttributeValueAssociatedList, $itemCheckedAttributeValue)
+    {
         // 处理默认属性
-        foreach ($merchandiseInfo['attribute_value_associated_List'] as &$attributeValueItemValues) {
+        foreach ($merchandiseAttributeValueAssociatedList as $key => $attributeValueItemValues) {
             foreach ($attributeValueItemValues['values'] as $k => $attributeValueItemValue) {
                 if (in_array($attributeValueItemValue['id'], $itemCheckedAttributeValue)) {
-                    $attributeValueItemValues['values'][$k]['is_checked'] = 1;
+                    $merchandiseAttributeValueAssociatedList[$key]['values'][$k]['is_checked'] = 1;
                 } else {
-                    $attributeValueItemValues['values'][$k]['is_checked'] = 0;
+                    $attributeValueItemValues[$key]['values'][$k]['is_checked'] = 0;
                 }
             }
         }
         unset($attributeValueItemValues);
-
-        $merchandiseInfo['item_list'] = $merchandiseItemList;
-
-        return $merchandiseInfo;
-    }
-
-    /**
-     * 更新商品
-     *
-     * @param $params
-     */
-    public function update($params)
-    {
 
     }
 
