@@ -18,7 +18,8 @@ class MerchandiseItemAttributeValueService extends AbstractService implements Me
      * MerchandiseItemAttributeValueService constructor.
      * @throws \Exception
      */
-    public function __construct(){
+    public function __construct()
+    {
         parent::__construct();
     }
 
@@ -27,13 +28,16 @@ class MerchandiseItemAttributeValueService extends AbstractService implements Me
      *
      * @param $conditions
      * @param $options
+     *
      * @return array
      */
-    public function getMerchandiseItemAttributeValueList($conditions=[], $options=[]): array
+    public function getMerchandiseItemAttributeValueList($conditions = [], $options = []): array
     {
         $model = $this->getModelObject();
-        $data = $this->optionWhere($model, $conditions, $options)->get();
+        $data  = $this->optionWhere($model, $conditions, $options)
+                      ->get();
         $data || $data = collect([]);
+
         return $data->toArray();
     }
 }
