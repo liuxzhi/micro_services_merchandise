@@ -217,16 +217,16 @@ class MerchandiseHandler
         $itemList = $this->MerchandiseItemService->getMerchandiseItemList(['merchandise_id' => $merchandiseId],
             ['orderByRaw' => 'id asc'], ['id', 'merchandise_id', 'merchandise_no', 'storage', 'name', 'image', 'attribute_ids', 'attribute_value_ids']);
 
-        $merchandiseItemId          = $params['item_id'] ?? $itemList[0]['id'];
+        $merchandiseItemId = $params['item_id'] ?? $itemList[0]['id'];
         $merchandiseInfo['item_id'] = $merchandiseItemId;
 
-        $merchandiseAttributeValueAssociatedList = $this->getMerchandiseAttributeValueAssociatedList($merchandiseItemId);
+        $merchandiseAttributeValueAssociatedList = $this->getMerchandiseAttributeValueAssociatedList($merchandiseId);
 
         // 单品信息(item)
         $merchandiseItemList = $this->formatMerchandiseItemList($itemList, $merchandiseItemId);
-
         // 获取选中的属性值
         $itemCheckedAttributeValue = $this->getCheckedAttributeValue($merchandiseItemList);
+
         $this->doCheckedAttributeValue($merchandiseAttributeValueAssociatedList, $itemCheckedAttributeValue);
 
         $merchandiseInfo['attribute_value_associated_list'] = $merchandiseAttributeValueAssociatedList;
@@ -257,6 +257,8 @@ class MerchandiseHandler
         // 商品属性列表
         $merchandiseAttributeList = $this->MerchandiseAttributeService->getMerchandiseAttributeList(['merchandise_id' => $merchandiseId],
             [], ['id', 'merchandise_id', 'attribute_id']);
+
+        print_r($merchandiseAttributeList);
 
         $attributeIds  = array_column($merchandiseAttributeList, 'attribute_id');
         $attributeList = $this->AttributeService->getAttributeList([['id', "IN", $attributeIds]], [], ['id', 'name']);
@@ -374,7 +376,7 @@ class MerchandiseHandler
     {
         $itemCheckedAttributeValue         = [];
         foreach ($merchandiseItemList as $merchandiseItem) {
-            if ($merchandiseItem['is_check'] == 1) {
+            if ($merchandiseItem['is_checked'] == 1) {
                 $itemCheckedAttributeValue    = $merchandiseItem['item_attribute_value'];
             }
         }
@@ -399,8 +401,6 @@ class MerchandiseHandler
                 }
             }
         }
-        unset($attributeValueItemValues);
-
     }
 
     /**
