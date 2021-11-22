@@ -265,7 +265,8 @@ abstract class AbstractService
 
     /**
      * 获取操作的模型名称
-     * @return \Hyperf\Database\Model\Model
+     *
+     * @return string
      */
     protected function getModelClass()
     {
