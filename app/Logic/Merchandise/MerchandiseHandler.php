@@ -17,7 +17,7 @@ use App\Contract\AttributeValueServiceInterface;
 use Hyperf\DbConnection\Db;
 use App\Helper\Log;
 
-// TODO : 长业务逻辑代码拆
+// TODO : 长业务逻辑代码拆(创建)
 class MerchandiseHandler
 {
     /**
@@ -257,8 +257,6 @@ class MerchandiseHandler
         // 商品属性列表
         $merchandiseAttributeList = $this->MerchandiseAttributeService->getMerchandiseAttributeList(['merchandise_id' => $merchandiseId],
             [], ['id', 'merchandise_id', 'attribute_id']);
-
-        print_r($merchandiseAttributeList);
 
         $attributeIds  = array_column($merchandiseAttributeList, 'attribute_id');
         $attributeList = $this->AttributeService->getAttributeList([['id', "IN", $attributeIds]], [], ['id', 'name']);
