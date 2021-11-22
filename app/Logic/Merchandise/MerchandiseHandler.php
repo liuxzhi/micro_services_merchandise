@@ -305,10 +305,10 @@ class MerchandiseHandler
 
         $merchandiseAttributeValueAssociatedList = [];
         foreach ($itemsMerchandiseAttributeValueList as $attributeId => $itemsMerchandiseAttributeValue) {
+            $name  = "";
             $merchandiseAttributeValueAssociatedData = [];
 
             $merchandiseAttributeValueAssociatedData['attribute_id'] = $attributeId;
-            $name                                                    = "";
             foreach ($merchandiseAttributeList as $merchandiseAttribute) {
                 if ($attributeId == $merchandiseAttribute['attribute_id']) {
                     $name = $merchandiseAttribute['name'];
