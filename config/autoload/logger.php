@@ -14,14 +14,14 @@ return [
         'handler' => [
             'class' => Monolog\Handler\StreamHandler::class,
             'constructor' => [
-                'stream' => BASE_PATH . '/runtime/logs/hyperf.log',
+                'stream' => BASE_PATH . '/runtime/logs/' . date('Y-m-d') . '.log',
                 'level' => Monolog\Logger::DEBUG,
             ],
         ],
         'formatter' => [
-            'class' => Monolog\Formatter\LineFormatter::class,
+            'class' => Monolog\Formatter\JsonFormatter::class,
             'constructor' => [
-                'format' => null,
+                'format' => "[%datetime%] %trace_id% %channel% %level_name% %message% %context% %extra%\n",
                 'dateFormat' => 'Y-m-d H:i:s',
                 'allowInlineLineBreaks' => true,
             ],
