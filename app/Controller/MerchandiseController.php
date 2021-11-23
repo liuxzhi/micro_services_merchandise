@@ -23,6 +23,7 @@ class MerchandiseController extends AbstractController
     {
         // 验证商品创建
         $params = $this->request->all();
+
         return apiReturn(ErrorCode::SUCCESS, '', $this->merchandiseHandler->create($params));
     }
 
@@ -32,8 +33,37 @@ class MerchandiseController extends AbstractController
     public function get()
     {
         $params = $this->request->all();
-        return apiReturn(ErrorCode::SUCCESS, '',$this->merchandiseHandler->get($params));
+
+        return apiReturn(ErrorCode::SUCCESS, '', $this->merchandiseHandler->get($params));
     }
+
+    /**
+     * 更新商品信息
+     * @return array
+     */
+    public function update()
+    {
+        $params = $this->request->all();
+        return apiReturn(ErrorCode::SUCCESS, '', $this->merchandiseHandler->update($params));
+
+    }
+
+    /**
+     * 商品上下架
+     */
+    public function state()
+    {
+
+    }
+
+    /**
+     * 商品单品的上下架
+     */
+    public function itemState()
+    {
+
+    }
+
 
     /**
      * 获取商品和单品关联关系列表
@@ -41,7 +71,7 @@ class MerchandiseController extends AbstractController
      */
     public function merchandiseAssociatedMerchandiseItemsList()
     {
-        $params = $this->request->all();
+        $params  = $this->request->all();
         $columns = [
             'merchandise.id',
             'merchandise.name',
@@ -53,6 +83,7 @@ class MerchandiseController extends AbstractController
             'storage',
             'image'
         ];
+
         return $this->merchandiseHandler->getMerchandiseAssociatedMerchandiseItemsList($params, $columns);
     }
 
