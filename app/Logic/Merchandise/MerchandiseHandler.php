@@ -151,14 +151,31 @@ class MerchandiseHandler
         return $merchandiseInfo;
     }
 
+
     /**
-     * 更新商品
+     * @param array $params
      *
-     * @param $params
+     * @return array
      */
     public function update(array $params)
     {
+        // 验证参数
+        $this->validateExtendedUpdateParams($params);
+        $merchandiseId = 0;
+        try {
+            Db::beginTransaction();
+            // 更新商品(SPU)
+            $merchandiseId = $this->updateMerchandise($params);
+            // 更新商品对应单品(SKU)
+            $this->updateMerchandiseItems($params);
 
+            Db::commit();
+        } catch (throwable $throwable) {
+            Db::rollBack();
+            Log::error("update_merchandise_error", ['params' => $params, "message" => $throwable->getMessage()]);
+        }
+
+        return ['merchandise_id' => $merchandiseId];
     }
 
     /**
@@ -463,6 +480,49 @@ class MerchandiseHandler
 
             }
         }
+    }
+
+
+    /**
+     * 扩展验证创建参数
+     * @param array $params
+     *
+     * @return array
+     */
+    protected function validateExtendedCreateParams(array $params)
+    {
+        return $params;
+    }
+
+    /**
+     * 扩展验证更新参数
+     * @param array $params
+     *
+     * @return array
+     */
+    protected function validateExtendedUpdateParams(array $params)
+    {
+        return $params;
+    }
+
+    /**
+     * 更新商品基本属性信息
+     *
+     * @param array $params
+     */
+    protected function updateMerchandise(array $params)
+    {
+
+    }
+
+    /**
+     * 更新商品单品信息
+     *
+     * @param array $params
+     */
+    protected function updateMerchandiseItems( array $params)
+    {
+
     }
 
 }
