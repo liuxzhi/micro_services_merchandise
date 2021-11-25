@@ -281,7 +281,7 @@ abstract class AbstractService
      *
      * @throws \Exception
      */
-    protected function setModelClass($className)
+    protected final function setModelClass($className)
     {
         if ($this->modelClass) {
             throw new \LogicException("service model class property can't change");
