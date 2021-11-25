@@ -6,6 +6,7 @@ namespace App\Controller;
 use Hyperf\Di\Annotation\Inject;
 use App\Logic\Merchandise\MerchandiseHandler;
 use App\Constants\ErrorCode;
+use App\Helper\Log;
 
 class MerchandiseController extends AbstractController
 {
@@ -33,7 +34,7 @@ class MerchandiseController extends AbstractController
     public function get()
     {
         $params = $this->request->all();
-
+        Log::info("哈哈哈", $params);
         return apiReturn(ErrorCode::SUCCESS, '', $this->merchandiseHandler->get($params));
     }
 
