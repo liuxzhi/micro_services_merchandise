@@ -9,5 +9,12 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
-$dependencies = serviceMap();
+
+$serviceDependencies = serviceMap();
+$dependencies =  [
+    Hyperf\HttpServer\CoreMiddleware::class => App\Middleware\CoreMiddleware::class,
+];
+
+$dependencies = array_merge($serviceDependencies, $dependencies);
+
 return $dependencies;

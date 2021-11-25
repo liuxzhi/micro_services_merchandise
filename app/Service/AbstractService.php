@@ -11,7 +11,7 @@ abstract class AbstractService
     /**
      * @var string
      */
-    protected $modelClass = "";
+    private $modelClass = "";
 
     /**
      * AbstractService constructor.
@@ -276,10 +276,16 @@ abstract class AbstractService
     /**
      * 设置操作的模型名称
      *
+     *
      * @param $className
+     *
+     * @throws \Exception
      */
     protected function setModelClass($className)
     {
+        if ($this->modelClass) {
+            throw new \LogicException("service model class property can't change");
+        }
         $this->modelClass = $className;
     }
 

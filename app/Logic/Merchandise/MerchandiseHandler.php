@@ -131,9 +131,18 @@ class MerchandiseHandler
         $merchandiseInfo = $this->MerchandiseService->get(['id' => $merchandiseId], ['id', 'name', 'introduction'])[0];
 
         $itemList = $this->MerchandiseItemService->getMerchandiseItemList(['merchandise_id' => $merchandiseId],
-            ['orderByRaw' => 'id asc'], ['id', 'merchandise_id', 'merchandise_no', 'storage', 'name', 'image', 'attribute_ids', 'attribute_value_ids']);
+            ['orderByRaw' => 'id asc'], [
+                'id',
+                'merchandise_id',
+                'merchandise_no',
+                'storage',
+                'name',
+                'image',
+                'attribute_ids',
+                'attribute_value_ids'
+            ]);
 
-        $merchandiseItemId = $params['item_id'] ?? $itemList[0]['id'];
+        $merchandiseItemId          = $params['item_id'] ?? $itemList[0]['id'];
         $merchandiseInfo['item_id'] = $merchandiseItemId;
 
         $merchandiseAttributeValueAssociatedList = $this->getMerchandiseAttributeValueAssociatedList($merchandiseId);
@@ -146,13 +155,15 @@ class MerchandiseHandler
         $this->doCheckedAttributeValue($merchandiseAttributeValueAssociatedList, $itemCheckedAttributeValue);
 
         $merchandiseInfo['attribute_value_associated_list'] = $merchandiseAttributeValueAssociatedList;
-        $merchandiseInfo['item_list'] = $merchandiseItemList;
+        $merchandiseInfo['item_list']                       = $merchandiseItemList;
 
         return $merchandiseInfo;
     }
 
 
     /**
+     * 更新商品和商品单品信息
+     *
      * @param array $params
      *
      * @return array
@@ -161,15 +172,17 @@ class MerchandiseHandler
     {
         // 验证参数
         $this->validateExtendedUpdateParams($params);
-        $merchandiseId = 0;
+
         try {
             Db::beginTransaction();
+
             // 更新商品(SPU)
             $merchandiseId = $this->updateMerchandise($params);
             // 更新商品对应单品(SKU)
             $this->updateMerchandiseItems($params);
 
             Db::commit();
+
         } catch (throwable $throwable) {
             Db::rollBack();
             Log::error("update_merchandise_error", ['params' => $params, "message" => $throwable->getMessage()]);
@@ -238,7 +251,7 @@ class MerchandiseHandler
 
         $merchandiseAttributeValueAssociatedList = [];
         foreach ($itemsMerchandiseAttributeValueList as $attributeId => $itemsMerchandiseAttributeValue) {
-            $name  = "";
+            $name                                    = "";
             $merchandiseAttributeValueAssociatedData = [];
 
             $merchandiseAttributeValueAssociatedData['attribute_id'] = $attributeId;
@@ -265,6 +278,7 @@ class MerchandiseHandler
 
     /**
      * 获取商品商品单品列表
+     *
      * @param $merchandiseItemList
      * @param $merchandiseItemId
      *
@@ -275,14 +289,13 @@ class MerchandiseHandler
 
         foreach ($merchandiseItemList as &$merchandiseItem) {
 
-            $itemsAttributeIds = explode(",", $merchandiseItem['attribute_ids']);
-            $itemsAttributeValueIds =  explode(",", $merchandiseItem['attribute_value_ids']);
+            $itemsAttributeIds      = explode(",", $merchandiseItem['attribute_ids']);
+            $itemsAttributeValueIds = explode(",", $merchandiseItem['attribute_value_ids']);
 
             foreach ($itemsAttributeIds as $k => $itemsAttributeId) {
                 $merchandiseItem['item_attribute_value'][$itemsAttributeId] = $itemsAttributeValueIds[$k];
             }
-            $merchandiseItem['item_attribute_value_ids'] = implode(',',
-                $merchandiseItem['item_attribute_value']);
+            $merchandiseItem['item_attribute_value_ids'] = implode(',', $merchandiseItem['item_attribute_value']);
 
             if ($merchandiseItem['id'] == $merchandiseItemId) {
                 $merchandiseItem['is_checked'] = 1;
@@ -299,16 +312,17 @@ class MerchandiseHandler
 
     /**
      * 获取选中的属性值
+     *
      * @param $merchandiseItemList
      *
      * @return array
      */
     protected function getCheckedAttributeValue($merchandiseItemList)
     {
-        $itemCheckedAttributeValue         = [];
+        $itemCheckedAttributeValue = [];
         foreach ($merchandiseItemList as $merchandiseItem) {
             if ($merchandiseItem['is_checked'] == 1) {
-                $itemCheckedAttributeValue    = $merchandiseItem['item_attribute_value'];
+                $itemCheckedAttributeValue = $merchandiseItem['item_attribute_value'];
             }
         }
 
@@ -317,6 +331,7 @@ class MerchandiseHandler
 
     /**
      *  选中的属性值
+     *
      * @param $merchandiseAttributeValueAssociatedList
      * @param $itemCheckedAttributeValue
      */
@@ -475,7 +490,7 @@ class MerchandiseHandler
                     'attribute_value_id' => $attributeValue['id']
                 ];
 
-                $result  = $this->MerchandiseItemAttributeValueService->create($itemAttributeValue);
+                $result                   = $this->MerchandiseItemAttributeValueService->create($itemAttributeValue);
                 $itemAttributeValue['id'] = $result['id'];
 
             }
@@ -485,6 +500,7 @@ class MerchandiseHandler
 
     /**
      * 扩展验证创建参数
+     *
      * @param array $params
      *
      * @return array
@@ -496,6 +512,7 @@ class MerchandiseHandler
 
     /**
      * 扩展验证更新参数
+     *
      * @param array $params
      *
      * @return array
@@ -520,7 +537,7 @@ class MerchandiseHandler
      *
      * @param array $params
      */
-    protected function updateMerchandiseItems( array $params)
+    protected function updateMerchandiseItems(array $params)
     {
 
     }
