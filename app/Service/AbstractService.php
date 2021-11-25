@@ -11,7 +11,7 @@ abstract class AbstractService
     /**
      * @var string
      */
-    private $modelClass = "";
+    private $modelClass = '';
 
     /**
      * AbstractService constructor.
@@ -295,7 +295,11 @@ abstract class AbstractService
      */
     public function getModelObject()
     {
-        return $model = new $this->modelClass ();
+        if ($this->getModelClass()) {
+            return $model = new $this->modelClass ();
+        }
+
+        throw new \LogicException("service model class can't be empty string");
     }
 
 }
