@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Service;
 use App\Contract\MerchandiseItemAttributeServiceInterface;
+use App\Model\MerchandiseItemAttribute;
 
 /**
  * @method array get()
@@ -36,5 +37,14 @@ class MerchandiseItemAttributeService extends AbstractService implements Merchan
         $data = $this->optionWhere($model, $conditions, $options)->select($columns)->get();
         $data || $data = collect([]);
         return $data->toArray();
+    }
+
+    /**
+     * 获取数据库操作对象
+     * @return Category|mixed
+     */
+    public function getModelObject()
+    {
+        return new MerchandiseItemAttribute();
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Contract\AttributeServiceInterface;
+use App\Model\Attribute;
 
 /**
  * @method array get()
@@ -45,5 +46,10 @@ class AttributeService extends AbstractService implements AttributeServiceInterf
 
         return $data->toArray();
 
+    }
+
+    public function getModelObject()
+    {
+        return new Attribute();
     }
 }

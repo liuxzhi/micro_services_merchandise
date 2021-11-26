@@ -3,36 +3,9 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-use Hyperf\DbConnection\Model\Model;
-
 
 abstract class AbstractService
 {
-    /**
-     * @var string
-     */
-    private $modelClass = '';
-
-    /**
-     * AbstractService constructor.
-     * @throws \Exception
-     */
-    public function __construct()
-    {
-        if (!$this->modelClass) {
-            $modelClass = str_replace(['\Service', 'Service'], ['\Model', ''], get_class($this));
-
-            if (!class_exists($modelClass)) {
-                throw new \Exception("model " . $modelClass . "isn't exist");
-            }
-
-            if (!is_subclass_of($modelClass, Model::class)) {
-                throw new \Exception("model class must be subclass of Hyperf\DbConnection\Model\Model");
-            }
-
-            $this->setModelClass($modelClass);
-        }
-    }
 
     /**
      * @param $params
@@ -264,42 +237,9 @@ abstract class AbstractService
 
 
     /**
-     * 获取操作的模型名称
-     *
-     * @return string
-     */
-    protected function getModelClass()
-    {
-        return $this->modelClass;
-    }
-
-    /**
-     * 设置操作的模型名称
-     *
-     *
-     * @param $className
-     *
-     * @throws \Exception
-     */
-    protected final function setModelClass($className)
-    {
-        if ($this->modelClass) {
-            throw new \LogicException("service model class property can't change");
-        }
-        $this->modelClass = $className;
-    }
-
-    /**
      * 获取model对象
      * @return mixed
      */
-    public function getModelObject()
-    {
-        if ($this->getModelClass()) {
-            return $model = new $this->modelClass ();
-        }
-
-        throw new \LogicException("service model class can't be empty string");
-    }
+    abstract public function getModelObject();
 
 }

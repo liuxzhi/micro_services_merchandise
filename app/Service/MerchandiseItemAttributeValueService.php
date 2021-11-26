@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Contract\MerchandiseItemAttributeValueServiceInterface;
+use App\Model\MerchandiseItemAttributeValue;
 
 /**
  * @method array get()
@@ -39,5 +40,15 @@ class MerchandiseItemAttributeValueService extends AbstractService implements Me
         $data || $data = collect([]);
 
         return $data->toArray();
+    }
+
+
+    /**
+     * 获取数据库操作对象
+     * @return Category|mixed
+     */
+    public function getModelObject()
+    {
+        return new MerchandiseItemAttributeValue();
     }
 }

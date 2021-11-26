@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Contract\AttributeValueServiceInterface;
+use App\Model\AttributeValue;
 
 /**
  * @method array get()
@@ -37,5 +38,11 @@ class AttributeValueService extends AbstractService implements AttributeValueSer
         $data = $this->optionWhere($model, $conditions, $options)->select($columns)->get();
         $data || $data = collect([]);
         return $data->toArray();
+    }
+
+
+    public function getModelObject()
+    {
+        return new AttributeValue();
     }
 }

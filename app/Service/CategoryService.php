@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Service;
 use App\Contract\CategoryServiceInterface;
+use App\Model\Category;
 
 /**
  * @method array get()
@@ -37,5 +38,14 @@ class CategoryService extends AbstractService implements CategoryServiceInterfac
         $data = $this->optionWhere($model, $conditions, $options)->select($columns)->get();
         $data || $data = collect([]);
         return $data->toArray();
+    }
+
+    /**
+     * 获取数据库操作对象
+     * @return Category|mixed
+     */
+    public function getModelObject()
+    {
+        return new Category();
     }
 }
