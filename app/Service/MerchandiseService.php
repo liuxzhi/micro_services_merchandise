@@ -39,7 +39,7 @@ class MerchandiseService  extends AbstractService implements MerchandiseServiceI
      */
     public function getModelObject()
     {
-        return new Merchandise();
+        return make(Merchandise::class);
     }
 
 }

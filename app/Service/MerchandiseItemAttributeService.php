@@ -38,6 +38,6 @@ class MerchandiseItemAttributeService extends AbstractService implements Merchan
      */
     public function getModelObject()
     {
-        return new MerchandiseItemAttribute();
+        return make(MerchandiseItemAttribute::class);
     }
 }

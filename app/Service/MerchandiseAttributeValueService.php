@@ -36,6 +36,6 @@ class MerchandiseAttributeValueService extends AbstractService implements Mercha
      */
     public function getModelObject()
     {
-        return new MerchandiseAttributeValue();
+        return make(MerchandiseAttributeValue::class);
     }
 }

@@ -39,6 +39,6 @@ class CategoryService extends AbstractService implements CategoryServiceInterfac
      */
     public function getModelObject()
     {
-        return new Category();
+        return make(Category::class);
     }
 }

@@ -36,6 +36,6 @@ class AttributeValueService extends AbstractService implements AttributeValueSer
 
     public function getModelObject()
     {
-        return new AttributeValue();
+        return make(AttributeValue::class);
     }
 }

@@ -42,6 +42,6 @@ class AttributeService extends AbstractService implements AttributeServiceInterf
 
     public function getModelObject()
     {
-        return new Attribute();
+        return make(Attribute::class);
     }
 }
