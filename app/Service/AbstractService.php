@@ -6,7 +6,6 @@ namespace App\Service;
 
 abstract class AbstractService
 {
-
     /**
      * @param $params
      *

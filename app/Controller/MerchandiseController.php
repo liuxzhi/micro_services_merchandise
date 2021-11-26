@@ -71,6 +71,7 @@ class MerchandiseController extends AbstractController
     public function merchandiseAssociatedMerchandiseItemsList()
     {
         $params  = $this->request->all();
+
         $columns = [
             'merchandise.id',
             'merchandise.name',
