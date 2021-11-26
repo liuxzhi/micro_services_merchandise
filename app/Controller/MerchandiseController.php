@@ -34,7 +34,6 @@ class MerchandiseController extends AbstractController
     public function get()
     {
         $params = $this->request->all();
-        Log::info("哈哈哈", $params);
         return apiReturn(ErrorCode::SUCCESS, '', $this->merchandiseHandler->get($params));
     }
 
@@ -46,7 +45,6 @@ class MerchandiseController extends AbstractController
     {
         $params = $this->request->all();
         return apiReturn(ErrorCode::SUCCESS, '', $this->merchandiseHandler->update($params));
-
     }
 
     /**
