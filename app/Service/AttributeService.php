@@ -15,14 +15,6 @@ use App\Model\Attribute;
  */
 class AttributeService extends AbstractService implements AttributeServiceInterface
 {
-    /**
-     * AttributeService constructor.
-     * @throws \Exception
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
 
 
     /**

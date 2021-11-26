@@ -14,13 +14,6 @@ use App\Model\Category;
  */
 class CategoryService extends AbstractService implements CategoryServiceInterface
 {
-    /**
-     * CategoryService constructor.
-     * @throws \Exception
-     */
-    public function __construct(){
-        parent::__construct();
-    }
 
 
     /**

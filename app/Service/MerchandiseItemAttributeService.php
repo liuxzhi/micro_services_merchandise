@@ -14,13 +14,6 @@ use App\Model\MerchandiseItemAttribute;
  */
 class MerchandiseItemAttributeService extends AbstractService implements MerchandiseItemAttributeServiceInterface
 {
-    /**
-     * MerchandiseItemAttributeService constructor.
-     * @throws \Exception
-     */
-    public function __construct(){
-        parent::__construct();
-    }
 
     /**
      * 根据查询条件获取属性值

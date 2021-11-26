@@ -15,13 +15,6 @@ use App\Model\MerchandiseItem;
  */
 class MerchandiseItemService extends AbstractService implements MerchandiseItemServiceInterface
 {
-    /**
-     * MerchandiseItemService constructor.
-     * @throws \Exception
-     */
-    public function __construct(){
-        parent::__construct();
-    }
 
     /**
      * 根据查询条件获取属性值

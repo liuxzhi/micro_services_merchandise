@@ -15,14 +15,6 @@ use App\Model\MerchandiseItemAttributeValue;
  */
 class MerchandiseItemAttributeValueService extends AbstractService implements MerchandiseItemAttributeValueServiceInterface
 {
-    /**
-     * MerchandiseItemAttributeValueService constructor.
-     * @throws \Exception
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
 
     /**
      * 根据查询条件获取属性值
