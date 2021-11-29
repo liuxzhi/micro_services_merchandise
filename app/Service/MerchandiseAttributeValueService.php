@@ -17,14 +17,16 @@ class MerchandiseAttributeValueService extends AbstractService implements Mercha
     /**
      * 根据查询条件获取属性值
      *
-     * @param $conditions
-     * @param $options
+     * @param array $conditions
+     * @param array $options
+     * @param array $columns
+     *
      * @return array
      */
-    public function getMerchandiseAttributeValueList($conditions=[], $options=[]): array
+    public function getMerchandiseAttributeValueList(array $conditions=[], array $options=[], array $columns = ['*']): array
     {
         $model = $this->getModelObject();
-        $data = $this->optionWhere($model, $conditions, $options)->get();
+        $data = $this->optionWhere($model, $conditions, $options)->select($columns)->get();
         $data || $data = collect([]);
         return $data->toArray();
     }

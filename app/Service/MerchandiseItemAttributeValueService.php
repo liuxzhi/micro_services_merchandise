@@ -19,12 +19,13 @@ class MerchandiseItemAttributeValueService extends AbstractService implements Me
     /**
      * 根据查询条件获取属性值
      *
-     * @param $conditions
-     * @param $options
+     * @param array $conditions
+     * @param array $options
+     * @param array $columns
      *
      * @return array
      */
-    public function getMerchandiseItemAttributeValueList($conditions = [], $options = []): array
+    public function getMerchandiseItemAttributeValueList(array $conditions = [], array $options = [], array $columns = ['*']): array
     {
         $model = $this->getModelObject();
         $data  = $this->optionWhere($model, $conditions, $options)
