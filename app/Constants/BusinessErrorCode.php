@@ -63,4 +63,10 @@ class BusinessErrorCode extends AbstractConstants
 	 */
 	const HTTP_API_RESPONSE_ERROR2 = 10104;
 
+
+    /**
+     * @Message("商品属性变更异常")
+     */
+    const MERCHANDISE_ATTRIBUTE_ERROR = 20005;
+
 }
