@@ -35,7 +35,8 @@ class MerchandiseAttributeService extends AbstractService implements Merchandise
 
     /**
      * 获取数据库操作对象
-     * @return Category|mixed
+     *
+     * @return MerchandiseAttribute|mixed
      */
     public function getModelObject()
     {

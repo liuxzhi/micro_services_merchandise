@@ -34,7 +34,8 @@ class MerchandiseItemAttributeService extends AbstractService implements Merchan
 
     /**
      * 获取数据库操作对象
-     * @return Category|mixed
+     *
+     * @return MerchandiseItemAttribute|mixed
      */
     public function getModelObject()
     {

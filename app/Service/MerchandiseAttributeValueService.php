@@ -32,7 +32,8 @@ class MerchandiseAttributeValueService extends AbstractService implements Mercha
 
     /**
      * 获取数据库操作对象
-     * @return Category|mixed
+     *
+     * @return MerchandiseAttributeValue|mixed
      */
     public function getModelObject()
     {

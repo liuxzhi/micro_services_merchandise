@@ -33,7 +33,9 @@ class AttributeValueService extends AbstractService implements AttributeValueSer
         return $data->toArray();
     }
 
-
+    /**
+     * @return AttributeValue|mixed
+     */
     public function getModelObject()
     {
         return make(AttributeValue::class);

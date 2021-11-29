@@ -40,6 +40,9 @@ class AttributeService extends AbstractService implements AttributeServiceInterf
 
     }
 
+    /**
+     * @return Attribute|mixed
+     */
     public function getModelObject()
     {
         return make(Attribute::class);

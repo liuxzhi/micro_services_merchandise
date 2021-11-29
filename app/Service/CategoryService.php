@@ -35,6 +35,7 @@ class CategoryService extends AbstractService implements CategoryServiceInterfac
 
     /**
      * 获取数据库操作对象
+     *
      * @return Category|mixed
      */
     public function getModelObject()
