@@ -53,6 +53,40 @@ abstract class AbstractService
                      ->update($params);
     }
 
+
+    /**
+     * 按条件更新数据
+     *
+     * @param $params
+     * @param $condition
+     *
+     * @return mixed
+     */
+    public function updateByCondition($params, $condition)
+    {
+        $model = $this->getModelObject();
+
+        return $this->optionWhere($model, $condition)
+                    ->update($params);
+    }
+
+    /**
+     * 按条件删除
+     *
+     * @param      $params
+     * @param      $condition
+     * @param bool $softDelete
+     *
+     * @return mixed
+     */
+    public function deleteByCondition($params, $condition, $softDelete = true)
+    {
+        $model = $this->getModelObject();
+
+        return $this->optionWhere($model, $condition)
+                    ->delete();
+    }
+
     /**
      * @param $params
      * @param $softDelete
@@ -64,13 +98,9 @@ abstract class AbstractService
         $model = $this->getModelObject();
         $id    = (int)$params['id'];
 
-        if ($softDelete) {
-            return $model->where(['id' => $id])
-                         ->update(['deleted_at' => time()]);
-        }
-
         return $model->where(['id' => $id])
-                     ->delete();
+                     ->update(['deleted_at' => time()]);
+
     }
 
 
