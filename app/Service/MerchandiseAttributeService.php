@@ -14,8 +14,6 @@ use App\Model\MerchandiseAttribute;
  */
 class MerchandiseAttributeService extends AbstractService implements MerchandiseAttributeServiceInterface
 {
-
-
     /**
      * 根据查询条件获取属性值
      *
