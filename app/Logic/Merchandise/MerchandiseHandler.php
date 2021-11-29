@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Logic\Merchandise;
 
+use App\Exception\BusinessException;
+use App\Constants\BusinessErrorCode;
 use Hyperf\Di\Annotation\Inject;
 
 use App\Contract\MerchandiseServiceInterface;
@@ -14,8 +16,10 @@ use App\Contract\MerchandiseItemAttributeServiceInterface;
 use App\Contract\MerchandiseItemAttributeValueServiceInterface;
 use App\Contract\AttributeServiceInterface;
 use App\Contract\AttributeValueServiceInterface;
+
 use Hyperf\DbConnection\Db;
 use App\Helper\Log;
+use throwable;
 
 class MerchandiseHandler
 {
@@ -24,6 +28,7 @@ class MerchandiseHandler
      * @var AttributeServiceInterface
      */
     protected $AttributeService;
+
     /**
      * @Inject
      * @var AttributeValueServiceInterface
@@ -81,8 +86,10 @@ class MerchandiseHandler
         try {
             Db::beginTransaction();
 
-            // 创建商品(SPU)
+            // 创建商品基本信息(SPU)
             $merchandiseId = $this->createMerchandise($params);
+            // 创建商品属性和属性值(SPU)
+            $this->createMerchandiseAttributeValue($merchandiseId, $params);
             // 创建商品对应单品(SKU)
             $this->createMerchandiseItems($merchandiseId, $params);
 
@@ -170,16 +177,21 @@ class MerchandiseHandler
      */
     public function update(array $params)
     {
-        // 验证参数
-        $this->validateExtendedUpdateParams($params);
 
+        $merchandiseAttributeList = $this->MerchandiseAttributeService->getMerchandiseAttributeList(['merchandise_id' => $params['id']], [], ['attribute_id', 'merchandise_id', 'id']);
+        // 验证参数
+        $this->validateExtendedUpdateParams($params, $merchandiseAttributeList);
+
+        $merchandiseId = $params['id'];
         try {
             Db::beginTransaction();
 
-            // 更新商品(SPU)
-            $merchandiseId = $this->updateMerchandise($params);
+            // 更新商品基本信息(SPU)
+            $merchandiseId = $this->updateMerchandise($merchandiseId, $params);
+            // 更新商品属性和属性值(SPU)
+            $merchandiseId = $this->updateMerchandiseAttributeValue($merchandiseId, $params);
             // 更新商品对应单品(SKU)
-            $this->updateMerchandiseItems($params);
+            $this->updateMerchandiseItems($merchandiseId, $params);
 
             Db::commit();
 
@@ -400,10 +412,18 @@ class MerchandiseHandler
     protected function createMerchandise(array $params)
     {
         $merchandiseData   = ['name' => $params['name'], 'introduction' => $params['introduction']];
-        $merchandiseResult = $this->MerchandiseService->create($merchandiseData);
+        $result = $this->MerchandiseService->create($merchandiseData);
+        return (int)$result['id'];
+    }
 
+    /**
+     * 创建商品属性和属性值信息
+     * @param $merchandiseId
+     * @param $params
+     */
+    protected function createMerchandiseAttributeValue($merchandiseId, $params)
+    {
         // 创建商品属性和商品属性值
-        $merchandiseId = $merchandiseResult['id'];
         $attributes    = array_keys($params['item_attribute_value']);
 
         $formattedAttributes = [];
@@ -426,8 +446,6 @@ class MerchandiseHandler
                 $formattedAttributeValues[]      = $formattedAttributeValue;
             }
         }
-
-        return (int)$merchandiseId;
     }
 
     /**
@@ -517,9 +535,18 @@ class MerchandiseHandler
      *
      * @return array
      */
-    protected function validateExtendedUpdateParams(array $params)
+    protected function validateExtendedUpdateParams(array $params, $merchandiseAttributeList)
     {
-        return $params;
+
+        $attributeIds = array_column($merchandiseAttributeList, 'attribute_id');
+        $attributeIdsFromClient = array_keys($params['item_attribute_value']);
+
+        $intersect = array_intersect($attributeIds, $attributeIdsFromClient);
+        if ($intersect == $attributeIds && $intersect == $attributeIdsFromClient) {
+            return $params;
+        }
+
+        throw new BusinessException(BusinessErrorCode::BusinessErrorCode);
     }
 
     /**
@@ -529,17 +556,111 @@ class MerchandiseHandler
      */
     protected function updateMerchandise(array $params)
     {
+        $merchandiseData   = ['name' => $params['name'], 'introduction' => $params['introduction'], 'id' =>$params['id']];
+        $this->MerchandiseService->update($merchandiseData);
+    }
 
+    /**
+     * 跟新商品属性和属性值
+     *
+     * @param $merchandiseId
+     * @param $params
+     */
+    protected function updateMerchandiseAttributeValue($merchandiseId, $params)
+    {
+        $merchandiseAttributeValueList = $this->MerchandiseAttributeValueService->getMerchandiseAttributeValueList(['merchandise_id' => $merchandiseId], [], ['merchandise_id', 'attribute_id', 'attribute_value_id']);
+
+        // 创建商品属性和商品属性值
+        $attributeIds    = array_keys($params['item_attribute_value']);
+        foreach ($attributeIds as $attributeId) {
+            $formattedAttributeValues   = [];
+            // 创建商品属性属性值
+            foreach ($params['item_attribute_value'][$attributeId] as $attributeValue) {
+
+                $formattedAttributeValue         = [
+                    "merchandise_id"     => $merchandiseId,
+                    "attribute_id"       => $attributeId,
+                    "attribute_value_id" => $attributeValue
+                ];
+
+                if(!in_array($formattedAttributeValue, $merchandiseAttributeValueList)) {
+                    $merchandiseAttributeValueResult = $this->MerchandiseAttributeValueService->create($formattedAttributeValue);
+                }
+
+                $formattedAttributeValue['id']   = $merchandiseAttributeValueResult['id'];
+                $formattedAttributeValues[]      = $formattedAttributeValue;
+            }
+        }
     }
 
     /**
      * 更新商品单品信息
      *
+     * @param       $merchandiseId
      * @param array $params
      */
-    protected function updateMerchandiseItems(array $params)
+    protected function updateMerchandiseItems($merchandiseId, array $params)
     {
+        $attributeValues            = array_values($params['item_attribute_value']);
+        $attributeValueCombinations = cartesian($attributeValues);
+        $merchandiseItemAttributeValueList = $this->MerchandiseItemAttributeValueService->getMerchandiseItemAttributeValueList(['merchandise_id' => $merchandiseId]);
 
+        foreach ($attributeValueCombinations as $attributeValueCombination) {
+
+            // 判断是否创建
+
+            $combinationAttributeValueData = explode(',', $attributeValueCombination);
+            $attributeValueList            = $this->AttributeValueService->getAttributeValueList([
+                [
+                    "id",
+                    "IN",
+                    $combinationAttributeValueData
+                ]
+            ]);
+
+            $attributeValueNameList = array_column($attributeValueList, 'value');
+            $itemName               = $params['name'] . " " . implode(" ", $attributeValueNameList);
+            $item                   = ["merchandise_id" => $merchandiseId, "name" => $itemName];
+
+            $itemCartesianInfo = $this->getParamsCartesian($params['items'], $attributeValueCombination);
+
+            $item['image']               = $itemCartesianInfo['image'];
+            $item['merchandise_no']      = $itemCartesianInfo['merchandise_no'];
+            $item['storage']             = $itemCartesianInfo['storage'];
+            $item['attribute_value_ids'] = $attributeValueCombination;
+            $item['attribute_ids']       = implode(",",
+                $this->getAttributeIdFromCombinations($attributeValueList, $combinationAttributeValueData));
+
+            $itemResult = $this->MerchandiseItemService->create($item);
+            $itemId     = $itemResult['id'];
+            $item['id'] = $itemId;
+
+            foreach ($attributeValueList as $attributeValue) {
+
+                // 创建SKU属性
+                $itemAttribute = [
+                    'merchandise_id' => $merchandiseId,
+                    'item_id'        => $itemId,
+                    'attribute_id'   => $attributeValue['attribute_id']
+                ];
+
+                $ItemAttributeResult = $this->MerchandiseItemAttributeService->create($itemAttribute);
+                $itemAttributeId     = $ItemAttributeResult['id'];
+                $itemAttribute['id'] = $itemAttributeId;
+
+                // 创建SKU属性属性值
+                $itemAttributeValue = [
+                    'merchandise_id'     => $merchandiseId,
+                    'item_id'            => $itemId,
+                    'attribute_id'       => $attributeValue['attribute_id'],
+                    'attribute_value_id' => $attributeValue['id']
+                ];
+
+                $result                   = $this->MerchandiseItemAttributeValueService->create($itemAttributeValue);
+                $itemAttributeValue['id'] = $result['id'];
+
+            }
+        }
     }
 
 }
