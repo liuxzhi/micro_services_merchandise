@@ -5,5 +5,5 @@ namespace App\Contract;
 
 interface MerchandiseAttributeValueServiceInterface
 {
-
+    public function getMerchandiseAttributeValueList(array $conditions=[], array $options=[], array $columns = ['*']): array;
 }
