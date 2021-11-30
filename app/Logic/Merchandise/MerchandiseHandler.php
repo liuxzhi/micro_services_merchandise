@@ -623,7 +623,7 @@ class MerchandiseHandler
             }
         }
 
-        $deleteAttributeValueCombinations = array_diff($attributeValueCombinations, array_merge($insertAttributeValueCombinations, $updateAttributeValueCombinations));
+        $deleteAttributeValueCombinations = array_diff($attributeValueCombinations, $updateAttributeValueCombinations);
 
         foreach ($attributeValueCombinations as $attributeValueCombination) {
 
