@@ -22,7 +22,7 @@ use App\Helper\Log;
 use throwable;
 use Hyperf\DbConnection\Db;
 
-
+// TODO 创建和跟新部分共同创建部分代码抽出来
 class MerchandiseHandler
 {
     /**
