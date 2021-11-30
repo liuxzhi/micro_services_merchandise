@@ -73,11 +73,10 @@ class MerchandiseHandler
     protected $MerchandiseItemAttributeValueService;
 
     /**
-     * 创建商品
-     *
      * @param $params
      *
      * @return array
+     * @throws throwable
      */
     public function create($params)
     {
@@ -96,6 +95,7 @@ class MerchandiseHandler
         } catch (throwable $throwable) {
             Db::rollBack();
             Log::error("create_merchandise_error", ['params' => $params, "message" => $throwable->getMessage()]);
+            throw $throwable;
         }
 
         return ['merchandise_id' => $merchandiseId];
@@ -166,18 +166,17 @@ class MerchandiseHandler
         return $merchandiseInfo;
     }
 
-
     /**
-     * 更新商品和商品单品信息
-     *
      * @param array $params
      *
      * @return array
+     * @throws throwable
      */
     public function update(array $params)
     {
 
-        $merchandiseAttributeList = $this->MerchandiseAttributeService->getMerchandiseAttributeList(['merchandise_id' => $params['id']], [], ['attribute_id', 'merchandise_id', 'id']);
+        $merchandiseAttributeList = $this->MerchandiseAttributeService->getMerchandiseAttributeList(['merchandise_id' => $params['id']],
+            [], ['attribute_id', 'merchandise_id', 'id']);
         // 验证参数
         $this->validateExtendedUpdateParams($params, $merchandiseAttributeList);
 
@@ -197,6 +196,7 @@ class MerchandiseHandler
         } catch (throwable $throwable) {
             Db::rollBack();
             Log::error("update_merchandise_error", ['params' => $params, "message" => $throwable->getMessage()]);
+            throw $throwable;
         }
 
         return ['merchandise_id' => $merchandiseId];
@@ -390,8 +390,9 @@ class MerchandiseHandler
         $attributeIds = [];
         foreach ($combinationAttributeValueData as $combinationAttributeValue) {
             foreach ($attributeValueList as $attributeValue) {
-                if ($attributeValue['value'] == $combinationAttributeValue) {
+                if ($combinationAttributeValue == $attributeValue['value']) {
                     $attributeIds[] = $attributeValue['attribute_id'];
+
                 }
             }
         }
@@ -410,20 +411,22 @@ class MerchandiseHandler
      */
     protected function createMerchandise(array $params)
     {
-        $merchandiseData   = ['name' => $params['name'], 'introduction' => $params['introduction']];
-        $result = $this->MerchandiseService->create($merchandiseData);
+        $merchandiseData = ['name' => $params['name'], 'introduction' => $params['introduction']];
+        $result          = $this->MerchandiseService->create($merchandiseData);
+
         return (int)$result['id'];
     }
 
     /**
      * 创建商品属性和属性值信息
+     *
      * @param $merchandiseId
      * @param $params
      */
     protected function createMerchandiseAttributeValue($merchandiseId, $params)
     {
         // 创建商品属性和商品属性值
-        $attributes    = array_keys($params['item_attribute_value']);
+        $attributes = array_keys($params['item_attribute_value']);
 
         $formattedAttributes = [];
         foreach ($attributes as $attribute) {
@@ -481,10 +484,9 @@ class MerchandiseHandler
             $item['attribute_value_ids'] = $attributeValueCombination;
             $item['attribute_ids']       = implode(",",
                 $this->getAttributeIdFromCombinations($attributeValueList, $combinationAttributeValueData));
-
-            $itemResult = $this->MerchandiseItemService->create($item);
-            $itemId     = $itemResult['id'];
-            $item['id'] = $itemId;
+            $itemResult                  = $this->MerchandiseItemService->create($item);
+            $itemId                      = $itemResult['id'];
+            $item['id']                  = $itemId;
 
             foreach ($attributeValueList as $attributeValue) {
 
@@ -537,7 +539,7 @@ class MerchandiseHandler
     protected function validateExtendedUpdateParams(array $params, $merchandiseAttributeList)
     {
 
-        $attributeIds = array_column($merchandiseAttributeList, 'attribute_id');
+        $attributeIds           = array_column($merchandiseAttributeList, 'attribute_id');
         $attributeIdsFromClient = array_keys($params['item_attribute_value']);
 
         $intersect = array_intersect($attributeIds, $attributeIdsFromClient);
@@ -551,11 +553,17 @@ class MerchandiseHandler
     /**
      * 更新商品基本属性信息
      *
+     *
+     * @param       $merchandiseId
      * @param array $params
      */
-    protected function updateMerchandise(array $params)
+    protected function updateMerchandise($merchandiseId, array $params)
     {
-        $merchandiseData   = ['name' => $params['name'], 'introduction' => $params['introduction'], 'id' =>$params['id']];
+        $merchandiseData = [
+            'name'         => $params['name'],
+            'introduction' => $params['introduction'],
+            'id'           => $merchandiseId
+        ];
         $this->MerchandiseService->update($merchandiseData);
     }
 
@@ -567,27 +575,28 @@ class MerchandiseHandler
      */
     protected function updateMerchandiseAttributeValue($merchandiseId, $params)
     {
-        $merchandiseAttributeValueList = $this->MerchandiseAttributeValueService->getMerchandiseAttributeValueList(['merchandise_id' => $merchandiseId], [], ['merchandise_id', 'attribute_id', 'attribute_value_id']);
+        $merchandiseAttributeValueList = $this->MerchandiseAttributeValueService->getMerchandiseAttributeValueList(['merchandise_id' => $merchandiseId],
+            [], ['merchandise_id', 'attribute_id', 'attribute_value_id']);
 
         // 创建商品属性和商品属性值
-        $attributeIds    = array_keys($params['item_attribute_value']);
+        $attributeIds = array_keys($params['item_attribute_value']);
         foreach ($attributeIds as $attributeId) {
-            $formattedAttributeValues   = [];
+            $formattedAttributeValues = [];
             // 创建商品属性属性值
             foreach ($params['item_attribute_value'][$attributeId] as $attributeValue) {
 
-                $formattedAttributeValue         = [
+                $formattedAttributeValue = [
                     "merchandise_id"     => $merchandiseId,
                     "attribute_id"       => $attributeId,
                     "attribute_value_id" => $attributeValue
                 ];
 
                 if (!in_array($formattedAttributeValue, $merchandiseAttributeValueList)) {
-                    $result = $this->MerchandiseAttributeValueService->create($formattedAttributeValue);
-                    $formattedAttributeValue['id']   = $result['id'];
+                    $result                        = $this->MerchandiseAttributeValueService->create($formattedAttributeValue);
+                    $formattedAttributeValue['id'] = $result['id'];
                 }
 
-                $formattedAttributeValues[]      = $formattedAttributeValue;
+                $formattedAttributeValues[] = $formattedAttributeValue;
             }
         }
     }
@@ -602,7 +611,7 @@ class MerchandiseHandler
     {
         $attributeValues            = array_values($params['item_attribute_value']);
         $attributeValueCombinations = cartesian($attributeValues);
-        $merchandiseItemList = $this->MerchandiseItemService->getMerchandiseItemList(['merchandise_id' => $merchandiseId]);
+        $merchandiseItemList        = $this->MerchandiseItemService->getMerchandiseItemList(['merchandise_id' => $merchandiseId]);
 
         // 新增
         $insertAttributeValueCombinations = [];
@@ -610,10 +619,12 @@ class MerchandiseHandler
         $updateAttributeValueCombinations = [];
 
         foreach ($attributeValueCombinations as $attributeValueCombination) {
+
             $create = false;
             foreach ($merchandiseItemList as $merchandiseItem) {
                 if ($attributeValueCombination == $merchandiseItem['attribute_value_ids']) {
                     $updateAttributeValueCombinations[] = $attributeValueCombination;
+                    $create                             = true;
                     break;
                 }
             }
@@ -628,8 +639,9 @@ class MerchandiseHandler
         foreach ($attributeValueCombinations as $attributeValueCombination) {
 
             $itemCartesianInfo = $this->getParamsCartesian($params['items'], $attributeValueCombination);
-            // 创建
-            if (empty($insertAttributeValueCombinations) && in_array($attributeValueCombination, $insertAttributeValueCombinations)) {
+            // 新增
+            if (empty($insertAttributeValueCombinations) && in_array($attributeValueCombination,
+                    $insertAttributeValueCombinations)) {
 
                 $combinationAttributeValueData = explode(',', $attributeValueCombination);
                 $attributeValueList            = $this->AttributeValueService->getAttributeValueList([
@@ -683,22 +695,23 @@ class MerchandiseHandler
                 }
             }
 
-
             // 更新
-            if (!empty($updateAttributeValueCombinations) && in_array($attributeValueCombination, $updateAttributeValueCombinations)) {
+            if (!empty($updateAttributeValueCombinations) && in_array($attributeValueCombination,
+                    $updateAttributeValueCombinations)) {
 
-                $item['image']               = $itemCartesianInfo['image'];
-                $item['merchandise_no']      = $itemCartesianInfo['merchandise_no'];
-                $item['storage']             = $itemCartesianInfo['storage'];
+                $item['image']          = $itemCartesianInfo['image'];
+                $item['merchandise_no'] = $itemCartesianInfo['merchandise_no'];
+                $item['storage']        = $itemCartesianInfo['storage'];
 
-                $conditions['merchandise_id'] =  $attributeValueCombination;
-                $conditions['attribute_value_id'] =  $attributeValueCombination;
+                $conditions['merchandise_id']     = $attributeValueCombination;
+                $conditions['attribute_value_id'] = $attributeValueCombination;
 
                 $this->MerchandiseItemService->updateByCondition($item, $conditions);
             }
 
             // 删除
-            if (!empty($deleteAttributeValueCombinations) && in_array($attributeValueCombination, $deleteAttributeValueCombinations)) {
+            if (!empty($deleteAttributeValueCombinations) && in_array($attributeValueCombination,
+                    $deleteAttributeValueCombinations)) {
                 $this->MerchandiseItemService->deleteByCondition($conditions);
             }
         }
