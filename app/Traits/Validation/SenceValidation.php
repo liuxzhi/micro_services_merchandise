@@ -20,6 +20,17 @@ trait SceneValidation
 {
 
     /**
+     * 获取方法明
+     * @param $method
+     *
+     * @return mixed
+     */
+    protected function getMethod($method)
+    {
+        return $method = explode("::", $method)[1] ?? "";
+    }
+
+    /**
      * 过滤规则场景化.
      * @param array $rules 过滤规则
      * @param string $scene

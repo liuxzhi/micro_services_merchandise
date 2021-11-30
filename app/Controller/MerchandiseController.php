@@ -63,8 +63,12 @@ class MerchandiseController extends AbstractController
      */
     public function state()
     {
-        $params = $this->request->all();
-        Log::info("state_params", $params);
+        $inputs = $this->request->all();
+        Log::info("state_params", $inputs);
+
+        $method = $this->getMethod(__METHOD__);
+        $params = $this->getPayload($inputs, $method);
+
         return apiReturn(ErrorCode::SUCCESS, '', $this->merchandiseHandler->state($params));
 
     }
@@ -74,8 +78,12 @@ class MerchandiseController extends AbstractController
      */
     public function itemState()
     {
-        $params = $this->request->all();
-        Log::info("state_params", $params);
+        $inputs = $this->request->all();
+        Log::info("state_params", $inputs);
+
+        $method = $this->getMethod(__METHOD__);
+        $params = $this->getPayload($inputs, $method);
+
         return apiReturn(ErrorCode::SUCCESS, '', $this->merchandiseHandler->itemState($params));
     }
 
@@ -86,7 +94,10 @@ class MerchandiseController extends AbstractController
      */
     public function merchandiseAssociatedMerchandiseItemsList()
     {
-        $params  = $this->request->all();
+        $inputs  = $this->request->all();
+
+        $method = $this->getMethod(__METHOD__);
+        $params = $this->getPayload($inputs, $method);
 
         $columns = [
             'merchandise.id',
