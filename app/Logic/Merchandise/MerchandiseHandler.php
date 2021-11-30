@@ -693,7 +693,6 @@ class MerchandiseHandler
 
                 $conditions['merchandise_id'] =  $attributeValueCombination;
                 $conditions['attribute_value_id'] =  $attributeValueCombination;
-                $conditions['deleted_at'] =  0;
 
                 $this->MerchandiseItemService->updateByCondition($item, $conditions);
             }
