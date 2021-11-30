@@ -710,11 +710,21 @@ class MerchandiseHandler
 
         // 删除
         if (!empty($deleteAttributeValueCombinations)) {
-            foreach ($deleteAttributeValueCombinations as $deleteAttributeValueCombination) {
-                $condition['merchandise_id'] = $merchandiseId;
-                $condition['attribute_value_ids'] = $deleteAttributeValueCombination;
-                $this->MerchandiseItemService->deleteByCondition($condition);
-            }
+
+            $merchandiseItemList = $this->MerchandiseItemService->getMerchandiseItemList([['attribute_value_ids', 'IN', $deleteAttributeValueCombinations]]);
+            $merchandiseItemIds = array_column($merchandiseItemList, 'id');
+
+            $condition['merchandise_id'] = $merchandiseId;
+            $condition[] = ['id' ,'IN', $merchandiseItemIds];
+            $this->MerchandiseItemService->deleteByCondition($condition);
+
+            $AttributeCondition['merchandise_id'] = $merchandiseId;
+            $AttributeCondition[] = ['item_id' ,'IN', $merchandiseItemIds];
+            $this->MerchandiseItemAttributeService->deleteByCondition($AttributeCondition);
+
+            $AttributeValueCondition['merchandise_id'] = $merchandiseId;
+            $AttributeValueCondition[] = ['item_id' ,'IN', $merchandiseItemIds];
+            $this->MerchandiseItemAttributeValueService->deleteByCondition($AttributeCondition);
         }
 
     }
