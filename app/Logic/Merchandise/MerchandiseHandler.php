@@ -92,6 +92,7 @@ class MerchandiseHandler
             $this->createMerchandiseItems($merchandiseId, $params);
 
             Db::commit();
+
         } catch (throwable $throwable) {
             Db::rollBack();
             Log::error("create_merchandise_error", ['params' => $params, "message" => $throwable->getMessage()]);
@@ -466,7 +467,7 @@ class MerchandiseHandler
         $attributeValueCombinations = cartesian($attributeValues);
 
         foreach ($attributeValueCombinations as $attributeValueCombination) {
-            $this->createItem($merchandiseId, $params, $attributeValueCombination);
+            $this->createMerchandiseItem($merchandiseId, $params, $attributeValueCombination);
         }
     }
 
