@@ -652,11 +652,12 @@ class MerchandiseHandler
         $deleteAttributeValueCombinations = array_diff($attributeValueIdsList, $updateAttributeValueCombinations);
 
         foreach ($attributeValueCombinations as $attributeValueCombination) {
-            $itemCartesianInfo = $this->getParamsCartesianInfo($params['items'], $attributeValueCombination);
+
             // 新增
             if (!empty($createAttributeValueCombinations) && in_array($attributeValueCombination,
                     $createAttributeValueCombinations)) {
 
+                $itemCartesianInfo = $this->getParamsCartesianInfo($params['items'], $attributeValueCombination);
                 $combinationAttributeValueData = explode(',', $attributeValueCombination);
                 $attributeValueList            = $this->AttributeValueService->getAttributeValueList([
                     [
@@ -713,6 +714,7 @@ class MerchandiseHandler
             if (!empty($updateAttributeValueCombinations) && in_array($attributeValueCombination,
                     $updateAttributeValueCombinations)) {
 
+                $itemCartesianInfo = $this->getParamsCartesianInfo($params['items'], $attributeValueCombination);
                 $item['image']          = $itemCartesianInfo['image'];
                 $item['merchandise_no'] = $itemCartesianInfo['merchandise_no'];
                 $item['storage']        = $itemCartesianInfo['storage'];
