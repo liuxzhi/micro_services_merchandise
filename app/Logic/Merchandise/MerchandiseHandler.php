@@ -582,11 +582,11 @@ class MerchandiseHandler
                     "attribute_value_id" => $attributeValue
                 ];
 
-                if(!in_array($formattedAttributeValue, $merchandiseAttributeValueList)) {
-                    $merchandiseAttributeValueResult = $this->MerchandiseAttributeValueService->create($formattedAttributeValue);
+                if (!in_array($formattedAttributeValue, $merchandiseAttributeValueList)) {
+                    $result = $this->MerchandiseAttributeValueService->create($formattedAttributeValue);
+                    $formattedAttributeValue['id']   = $result['id'];
                 }
 
-                $formattedAttributeValue['id']   = $merchandiseAttributeValueResult['id'];
                 $formattedAttributeValues[]      = $formattedAttributeValue;
             }
         }
