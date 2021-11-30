@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Logic\Merchandise;
 
-use App\Exception\BusinessException;
-use App\Constants\BusinessErrorCode;
+
 use Hyperf\Di\Annotation\Inject;
 
 use App\Contract\MerchandiseServiceInterface;
@@ -17,9 +16,12 @@ use App\Contract\MerchandiseItemAttributeValueServiceInterface;
 use App\Contract\AttributeServiceInterface;
 use App\Contract\AttributeValueServiceInterface;
 
-use Hyperf\DbConnection\Db;
+use App\Exception\BusinessException;
+use App\Constants\BusinessErrorCode;
 use App\Helper\Log;
 use throwable;
+use Hyperf\DbConnection\Db;
+
 
 class MerchandiseHandler
 {
@@ -528,6 +530,11 @@ class MerchandiseHandler
      */
     protected function validateExtendedCreateParams(array $params)
     {
+        foreach ($params['item_attribute_value'] as $attributeId => $attributeValue) {
+            if (empty($attributeValue)) {
+                throw new BusinessException(BusinessErrorCode::MERCHANDISE_ATTRIBUTE_VALUE_ERROR);
+            }
+        }
         return $params;
     }
 
@@ -544,12 +551,18 @@ class MerchandiseHandler
         $attributeIds           = array_column($merchandiseAttributeList, 'attribute_id');
         $attributeIdsFromClient = array_keys($params['item_attribute_value']);
 
+        foreach ($params['item_attribute_value'] as $attributeId => $attributeValue) {
+            if (empty($attributeValue)) {
+                throw new BusinessException(BusinessErrorCode::MERCHANDISE_ATTRIBUTE_VALUE_ERROR);
+            }
+        }
+
         $intersect = array_intersect($attributeIds, $attributeIdsFromClient);
         if ($intersect == $attributeIds && $intersect == $attributeIdsFromClient) {
             return $params;
         }
 
-        throw new BusinessException(BusinessErrorCode::BusinessErrorCode);
+        throw new BusinessException(BusinessErrorCode::MERCHANDISE_ATTRIBUTE_ERROR);
     }
 
     /**
