@@ -185,9 +185,9 @@ class MerchandiseHandler
             Db::beginTransaction();
 
             // 更新商品基本信息(SPU)
-            $merchandiseId = $this->updateMerchandise($merchandiseId, $params);
+            $this->updateMerchandise($merchandiseId, $params);
             // 更新商品属性和属性值(SPU)
-            $merchandiseId = $this->updateMerchandiseAttributeValue($merchandiseId, $params);
+            $this->updateMerchandiseAttributeValue($merchandiseId, $params);
             // 更新商品对应单品(SKU)
             $this->updateMerchandiseItems($merchandiseId, $params);
 
@@ -590,7 +590,6 @@ class MerchandiseHandler
                     "attribute_id"       => $attributeId,
                     "attribute_value_id" => $attributeValue
                 ];
-
                 if (!in_array($formattedAttributeValue, $merchandiseAttributeValueList)) {
                     $result                        = $this->MerchandiseAttributeValueService->create($formattedAttributeValue);
                     $formattedAttributeValue['id'] = $result['id'];
@@ -612,36 +611,36 @@ class MerchandiseHandler
         $attributeValues            = array_values($params['item_attribute_value']);
         $attributeValueCombinations = cartesian($attributeValues);
         $merchandiseItemList        = $this->MerchandiseItemService->getMerchandiseItemList(['merchandise_id' => $merchandiseId]);
-
+        $attributeValueIdsList = array_column($merchandiseItemList, "attribute_value_ids");
+        print_r($attributeValueIdsList);
         // 新增
-        $insertAttributeValueCombinations = [];
+        $createAttributeValueCombinations = [];
         // 更新
         $updateAttributeValueCombinations = [];
-
         foreach ($attributeValueCombinations as $attributeValueCombination) {
-
-            $create = false;
-            foreach ($merchandiseItemList as $merchandiseItem) {
-                if ($attributeValueCombination == $merchandiseItem['attribute_value_ids']) {
+            $create = true;
+            foreach ($attributeValueIdsList as $attributeValueIds) {
+                if ($attributeValueCombination == $attributeValueIds) {
                     $updateAttributeValueCombinations[] = $attributeValueCombination;
-                    $create                             = true;
+                    $create = false;
                     break;
                 }
             }
 
-            if (!$create) {
-                $insertAttributeValueCombinations[] = $attributeValueCombination;
+            if ($create) {
+                $createAttributeValueCombinations[] = $attributeValueCombination;
             }
         }
 
-        $deleteAttributeValueCombinations = array_diff($attributeValueCombinations, $updateAttributeValueCombinations);
+        $deleteAttributeValueCombinations = array_diff($attributeValueIdsList, $updateAttributeValueCombinations);
+
 
         foreach ($attributeValueCombinations as $attributeValueCombination) {
 
             $itemCartesianInfo = $this->getParamsCartesian($params['items'], $attributeValueCombination);
             // 新增
             if (empty($insertAttributeValueCombinations) && in_array($attributeValueCombination,
-                    $insertAttributeValueCombinations)) {
+                    $createAttributeValueCombinations)) {
 
                 $combinationAttributeValueData = explode(',', $attributeValueCombination);
                 $attributeValueList            = $this->AttributeValueService->getAttributeValueList([
@@ -703,8 +702,8 @@ class MerchandiseHandler
                 $item['merchandise_no'] = $itemCartesianInfo['merchandise_no'];
                 $item['storage']        = $itemCartesianInfo['storage'];
 
-                $conditions['merchandise_id']     = $attributeValueCombination;
-                $conditions['attribute_value_id'] = $attributeValueCombination;
+                $conditions['merchandise_id']     = $merchandiseId;
+                $conditions['attribute_value_ids'] = $attributeValueCombination;
 
                 $this->MerchandiseItemService->updateByCondition($item, $conditions);
             }
