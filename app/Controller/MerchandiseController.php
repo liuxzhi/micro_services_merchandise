@@ -38,16 +38,6 @@ class MerchandiseController extends AbstractController
     }
 
     /**
-     * 获取商品详情
-     */
-    public function get()
-    {
-        $params = $this->request->all();
-        Log::info("get_params", $params);
-        return apiReturn(ErrorCode::SUCCESS, '', $this->merchandiseHandler->get($params));
-    }
-
-    /**
      * 更新商品信息
      */
     public function update()
@@ -58,19 +48,35 @@ class MerchandiseController extends AbstractController
     }
 
     /**
-     * 商品上下架
+     * 获取商品详情
+     */
+    public function get()
+    {
+        $params = $this->request->all();
+        Log::info("get_params", $params);
+        return apiReturn(ErrorCode::SUCCESS, '', $this->merchandiseHandler->get($params));
+    }
+
+
+    /**
+     * 商品上下架(SPU)
      */
     public function state()
     {
+        $params = $this->request->all();
+        Log::info("state_params", $params);
+        return apiReturn(ErrorCode::SUCCESS, '', $this->merchandiseHandler->state($params));
 
     }
 
     /**
-     * 商品单品的上下架
+     * 商品单品(SKU)的上下架
      */
     public function itemState()
     {
-
+        $params = $this->request->all();
+        Log::info("state_params", $params);
+        return apiReturn(ErrorCode::SUCCESS, '', $this->merchandiseHandler->itemState($params));
     }
 
 

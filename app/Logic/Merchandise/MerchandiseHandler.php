@@ -82,7 +82,6 @@ class MerchandiseHandler
      */
     public function create($params)
     {
-        $merchandiseId = 0;
         try {
             Db::beginTransaction();
 
@@ -104,6 +103,7 @@ class MerchandiseHandler
     }
 
     /**
+     * 获取商品(spu)和sku
      * @param $params
      * @param $columns
      *
@@ -742,6 +742,32 @@ class MerchandiseHandler
             $this->MerchandiseItemAttributeValueService->deleteByCondition($AttributeCondition);
         }
 
+    }
+
+    /**
+     * 商品（SPU）上下架
+     *
+     * @param $params
+     *
+     * @return mixed
+     */
+    public function state($params)
+    {
+        $result = $this->MerchandiseService->update($params);
+        return $result;
+    }
+
+    /**
+     * 商品单品（SKU）上下架
+     *
+     * @param $params
+     *
+     * @return mixed
+     */
+    public function itemState($params)
+    {
+        $result = $this->MerchandiseItemService->update($params);
+        return $result;
     }
 
 }
