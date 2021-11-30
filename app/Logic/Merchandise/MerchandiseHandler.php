@@ -370,7 +370,7 @@ class MerchandiseHandler
      *
      * @return array|mixed
      */
-    protected function getParamsCartesian(array $params, string $key)
+    protected function getParamsCartesianInfo(array $params, string $key)
     {
         if (isset($params[$key])) {
             return $params[$key];
@@ -433,13 +433,14 @@ class MerchandiseHandler
         $formattedAttributes = [];
         foreach ($attributes as $attribute) {
 
-            $formattedAttribute = ["merchandise_id" => $merchandiseId, "attribute_id" => $attribute];
             // 创建商品属性
+            $formattedAttribute = ["merchandise_id" => $merchandiseId, "attribute_id" => $attribute];
             $merchandiseAttributeResult = $this->MerchandiseAttributeService->create($formattedAttribute);
             $formattedAttribute['id']   = $merchandiseAttributeResult['id'];
             $formattedAttributes[]      = $formattedAttribute;
-            $formattedAttributeValues   = [];
+
             // 创建商品属性属性值
+            $formattedAttributeValues   = [];
             foreach ($params['item_attribute_value'][$attribute] as $attributeValue) {
                 $formattedAttributeValue         = [
                     "merchandise_id"     => $formattedAttribute['merchandise_id'],
@@ -480,7 +481,7 @@ class MerchandiseHandler
             $itemName               = $params['name'] . " " . implode(" ", $attributeValueNameList);
             $item                   = ["merchandise_id" => $merchandiseId, "name" => $itemName];
 
-            $itemCartesianInfo = $this->getParamsCartesian($params['items'], $attributeValueCombination);
+            $itemCartesianInfo = $this->getParamsCartesianInfo($params['items'], $attributeValueCombination);
 
             $item['image']               = $itemCartesianInfo['image'];
             $item['merchandise_no']      = $itemCartesianInfo['merchandise_no'];
@@ -651,7 +652,7 @@ class MerchandiseHandler
         $deleteAttributeValueCombinations = array_diff($attributeValueIdsList, $updateAttributeValueCombinations);
 
         foreach ($attributeValueCombinations as $attributeValueCombination) {
-            $itemCartesianInfo = $this->getParamsCartesian($params['items'], $attributeValueCombination);
+            $itemCartesianInfo = $this->getParamsCartesianInfo($params['items'], $attributeValueCombination);
             // 新增
             if (!empty($createAttributeValueCombinations) && in_array($attributeValueCombination,
                     $createAttributeValueCombinations)) {
