@@ -612,34 +612,33 @@ class MerchandiseHandler
         $attributeValueCombinations = cartesian($attributeValues);
         $merchandiseItemList        = $this->MerchandiseItemService->getMerchandiseItemList(['merchandise_id' => $merchandiseId]);
         $attributeValueIdsList = array_column($merchandiseItemList, "attribute_value_ids");
-        print_r($attributeValueIdsList);
+
         // 新增
         $createAttributeValueCombinations = [];
         // 更新
         $updateAttributeValueCombinations = [];
-        foreach ($attributeValueCombinations as $attributeValueCombination) {
+
+        foreach ($attributeValueCombinations as $combination) {
             $create = true;
             foreach ($attributeValueIdsList as $attributeValueIds) {
-                if ($attributeValueCombination == $attributeValueIds) {
-                    $updateAttributeValueCombinations[] = $attributeValueCombination;
+                if ($combination == $attributeValueIds) {
+                    $updateAttributeValueCombinations[] = $combination;
                     $create = false;
                     break;
                 }
             }
 
             if ($create) {
-                $createAttributeValueCombinations[] = $attributeValueCombination;
+                $createAttributeValueCombinations[] = $combination;
             }
         }
 
         $deleteAttributeValueCombinations = array_diff($attributeValueIdsList, $updateAttributeValueCombinations);
 
-
         foreach ($attributeValueCombinations as $attributeValueCombination) {
-
             $itemCartesianInfo = $this->getParamsCartesian($params['items'], $attributeValueCombination);
             // 新增
-            if (empty($insertAttributeValueCombinations) && in_array($attributeValueCombination,
+            if (!empty($createAttributeValueCombinations) && in_array($attributeValueCombination,
                     $createAttributeValueCombinations)) {
 
                 $combinationAttributeValueData = explode(',', $attributeValueCombination);
@@ -702,18 +701,22 @@ class MerchandiseHandler
                 $item['merchandise_no'] = $itemCartesianInfo['merchandise_no'];
                 $item['storage']        = $itemCartesianInfo['storage'];
 
-                $conditions['merchandise_id']     = $merchandiseId;
-                $conditions['attribute_value_ids'] = $attributeValueCombination;
+                $condition['merchandise_id']     = $merchandiseId;
+                $condition['attribute_value_ids'] = $attributeValueCombination;
 
-                $this->MerchandiseItemService->updateByCondition($item, $conditions);
-            }
-
-            // 删除
-            if (!empty($deleteAttributeValueCombinations) && in_array($attributeValueCombination,
-                    $deleteAttributeValueCombinations)) {
-                $this->MerchandiseItemService->deleteByCondition($conditions);
+                $this->MerchandiseItemService->updateByCondition($item, $condition);
             }
         }
+
+        // 删除
+        if (!empty($deleteAttributeValueCombinations)) {
+            foreach ($deleteAttributeValueCombinations as $deleteAttributeValueCombination) {
+                $condition['merchandise_id'] = $merchandiseId;
+                $condition['attribute_value_ids'] = $deleteAttributeValueCombination;
+                $this->MerchandiseItemService->deleteByCondition($condition);
+            }
+        }
+
     }
 
 }

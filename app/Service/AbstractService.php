@@ -73,13 +73,11 @@ abstract class AbstractService
     /**
      * 按条件删除
      *
-     * @param      $params
      * @param      $condition
-     * @param bool $softDelete
      *
      * @return mixed
      */
-    public function deleteByCondition($params, $condition, $softDelete = true)
+    public function deleteByCondition($condition)
     {
         $model = $this->getModelObject();
 
