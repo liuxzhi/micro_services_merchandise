@@ -15,6 +15,7 @@ class MerchandiseController extends AbstractController
 
     // 场景值验证
     use SceneValidation;
+
     // 商品控制器场景验证规则
     use MerchandiseSceneRequest;
 
