@@ -430,6 +430,7 @@ class MerchandiseHandler
 
         $formattedAttributes = [];
         foreach ($attributes as $attribute) {
+
             $formattedAttribute = ["merchandise_id" => $merchandiseId, "attribute_id" => $attribute];
             // 创建商品属性
             $merchandiseAttributeResult = $this->MerchandiseAttributeService->create($formattedAttribute);
@@ -447,6 +448,7 @@ class MerchandiseHandler
                 $formattedAttributeValue['id']   = $merchandiseAttributeValueResult['id'];
                 $formattedAttributeValues[]      = $formattedAttributeValue;
             }
+
         }
     }
 
