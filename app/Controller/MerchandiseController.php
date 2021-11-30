@@ -7,9 +7,17 @@ use Hyperf\Di\Annotation\Inject;
 use App\Logic\Merchandise\MerchandiseHandler;
 use App\Constants\ErrorCode;
 use App\Helper\Log;
+use App\Traits\Validation\SceneValidation;
+use App\Request\Merchandise\MerchandiseSceneRequest;
 
 class MerchandiseController extends AbstractController
 {
+
+    // 场景值验证
+    use SceneValidation;
+    // 商品控制器场景验证规则
+    use MerchandiseSceneRequest;
+
     /**
      * @Inject
      * @var MerchandiseHandler
@@ -24,7 +32,7 @@ class MerchandiseController extends AbstractController
     {
         // 验证商品创建
         $params = $this->request->all();
-
+        Log::info("create_params", $params);
         return apiReturn(ErrorCode::SUCCESS, '', $this->merchandiseHandler->create($params));
     }
 
@@ -34,16 +42,17 @@ class MerchandiseController extends AbstractController
     public function get()
     {
         $params = $this->request->all();
+        Log::info("get_params", $params);
         return apiReturn(ErrorCode::SUCCESS, '', $this->merchandiseHandler->get($params));
     }
 
     /**
      * 更新商品信息
-     * @return array
      */
     public function update()
     {
         $params = $this->request->all();
+        Log::info("update_params", $params);
         return apiReturn(ErrorCode::SUCCESS, '', $this->merchandiseHandler->update($params));
     }
 
