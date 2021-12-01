@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 
-namespace app\Traits\Validation;
+namespace App\Traits\Validation;
 
 use Hyperf\Validation\Contract\ValidatorFactoryInterface;
 use Hyperf\Validation\ValidationException;
@@ -19,6 +19,20 @@ use Hyperf\Validation\ValidationException;
 trait SceneValidation
 {
 
+    /**
+     * @param $inputs
+     * @param $method
+     *
+     * @return array
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
+     */
+    protected function getPayload($inputs, $method)
+    {
+        $payload = $this->validated($inputs, $method);
+
+        return (array)$payload;
+    }
     /**
      * 获取方法明
      * @param $method
