@@ -22,7 +22,7 @@ use App\Constants\BusinessErrorCode;
 use App\Helper\Log;
 use throwable;
 use Hyperf\DbConnection\Db;
-use \Exception;
+use Exception;
 
 class MerchandiseHandler
 {
@@ -107,6 +107,7 @@ class MerchandiseHandler
     /**
      * 获取商品(spu)和sku
      *
+     *
      * @param array          $params
      * @param array|string[] $columns
      *
@@ -125,13 +126,13 @@ class MerchandiseHandler
                                                 "merchandise_item.merchandise_id", 'left')
                                             ->paginate($pageSize, $columns, $pageName, $page);
 
-        return $this->MerchandiseService->handlePagedData($merchandiseInfo->toArray(), 10);
+        return $this->MerchandiseService->handlePagedData($merchandiseInfo->toArray());
     }
 
     /**
      * 获取商品详情SPU 和 SKU列表
      *
-     * @param $params
+     * @param array $params
      *
      * @return mixed
      */
@@ -156,8 +157,11 @@ class MerchandiseHandler
         $merchandiseItemId          = $params['item_id'] ?? $itemList[0]['id'];
         $merchandiseInfo['item_id'] = $merchandiseItemId;
 
-        $merchandiseAttributeValueAssociatedList = $this->getMerchandiseAttributeValueAssociatedList($merchandiseId);
-
+        [$merchandiseAttributeValueAssociatedList, $merchandiseAttributeList, $attributeValueList] = $this->getMerchandiseAttributeValueAssociatedList($merchandiseId);
+        // 商品属性列表
+        $merchandiseInfo['attribute_list'] = $merchandiseAttributeList;
+        // 商品属性列表
+        $merchandiseInfo['attribute_value_list'] = $attributeValueList;
         // 单品信息(item)
         $merchandiseItemList = $this->formatMerchandiseItemList($itemList, $merchandiseItemId);
         // 获取选中的属性值
@@ -231,7 +235,6 @@ class MerchandiseHandler
             }
         }
         unset($merchandiseAttribute);
-        $merchandiseInfo['attribute_list'] = $merchandiseAttributeList;
 
         $merchandiseAttributeValueList = $this->MerchandiseAttributeValueService->getMerchandiseAttributeValueList(['merchandise_id' => $merchandiseId]);
         $attributeValueIds             = array_column($merchandiseAttributeValueList, 'attribute_value_id');
@@ -243,8 +246,7 @@ class MerchandiseHandler
             ]
         ], [], ['id', 'attribute_id', 'value']);
 
-        // 商品属性列表
-        $merchandiseInfo['attribute_value_list'] = $attributeValueList;
+
 
         $itemsMerchandiseAttributeValueList = [];
         foreach ($merchandiseAttributeValueList as &$merchandiseAttributeValue) {
@@ -288,12 +290,13 @@ class MerchandiseHandler
             $merchandiseAttributeValueAssociatedList[] = $merchandiseAttributeValueAssociatedData;
         }
 
-        return $merchandiseAttributeValueAssociatedList;
+        return [$merchandiseAttributeValueAssociatedList, $merchandiseAttributeList, $attributeValueList];
 
     }
 
     /**
      * 获取商品商品单品列表
+     *
      *
      * @param $merchandiseItemList
      * @param $merchandiseItemId
@@ -333,7 +336,7 @@ class MerchandiseHandler
      *
      * @return array
      */
-    protected function getCheckedAttributeValue($merchandiseItemList)
+    protected function getCheckedAttributeValue($merchandiseItemList) :array
     {
         $itemCheckedAttributeValue = [];
         foreach ($merchandiseItemList as $merchandiseItem) {
@@ -385,12 +388,13 @@ class MerchandiseHandler
     /**
      * 根据属性值获取属性id数组
      *
-     * @param $attributeValueList
-     * @param $combinationAttributeValueData
+     *
+     * @param array $attributeValueList
+     * @param array $combinationAttributeValueData
      *
      * @return array
      */
-    protected function getAttributeIdFromCombinations(array $attributeValueList, array $combinationAttributeValueData)
+    protected function getAttributeIdFromCombinations(array $attributeValueList, array $combinationAttributeValueData) :array
     {
         $attributeIds = [];
         foreach ($combinationAttributeValueData as $combinationAttributeValue) {
@@ -409,12 +413,11 @@ class MerchandiseHandler
     /**
      * 创建商品和商品属性和属性值
      *
-     *
      * @param array $params
      *
-     * @return mixed
+     * @return int
      */
-    protected function createMerchandise(array $params)
+    protected function createMerchandise(array $params) :int
     {
         $merchandiseData = ['name' => $params['name'], 'introduction' => $params['introduction']];
         $result          = $this->MerchandiseService->create($merchandiseData);
@@ -427,13 +430,16 @@ class MerchandiseHandler
      *
      * @param $merchandiseId
      * @param $params
+     *
+     * @return array[]
      */
-    protected function createMerchandiseAttributeValue($merchandiseId, $params)
+    protected function createMerchandiseAttributeValue($merchandiseId, $params) :array
     {
         // 创建商品属性和商品属性值
         $attributes = array_keys($params['item_attribute_value']);
 
         $formattedAttributes = [];
+        $formattedAttributeValues   = [];
         foreach ($attributes as $attribute) {
 
             // 创建商品属性
@@ -443,7 +449,6 @@ class MerchandiseHandler
             $formattedAttributes[]      = $formattedAttribute;
 
             // 创建商品属性属性值
-            $formattedAttributeValues   = [];
             foreach ($params['item_attribute_value'][$attribute] as $attributeValue) {
                 $formattedAttributeValue         = [
                     "merchandise_id"     => $formattedAttribute['merchandise_id'],
@@ -456,6 +461,7 @@ class MerchandiseHandler
             }
 
         }
+        return [$formattedAttributes, $formattedAttributeValues];
     }
 
     /**
@@ -476,9 +482,9 @@ class MerchandiseHandler
 
     /**
      * 创建商品单品（SKU）
-     * @param $merchandiseId
-     * @param $params
-     * @param $attributeValueCombination
+     * @param int    $merchandiseId
+     * @param array  $params
+     * @param string $attributeValueCombination
      */
     protected function createMerchandiseItem(int $merchandiseId, array  $params, string $attributeValueCombination)
     {
@@ -541,9 +547,9 @@ class MerchandiseHandler
      *
      * @return array
      */
-    protected function validateExtendedCreateParams(array $params)
+    protected function validateExtendedCreateParams(array $params) :array
     {
-        foreach ($params['item_attribute_value'] as $attributeId => $attributeValue) {
+        foreach ($params['item_attribute_value'] as $attributeValue) {
             if (empty($attributeValue)) {
                 throw new BusinessException(BusinessErrorCode::MERCHANDISE_ATTRIBUTE_VALUE_ERROR);
             }
@@ -555,16 +561,17 @@ class MerchandiseHandler
      * 扩展验证更新参数
      *
      * @param array $params
+     * @param       $merchandiseAttributeList
      *
      * @return array
      */
-    protected function validateExtendedUpdateParams(array $params, $merchandiseAttributeList)
+    protected function validateExtendedUpdateParams(array $params, $merchandiseAttributeList) :array
     {
 
         $attributeIds           = array_column($merchandiseAttributeList, 'attribute_id');
         $attributeIdsFromClient = array_keys($params['item_attribute_value']);
 
-        foreach ($params['item_attribute_value'] as $attributeId => $attributeValue) {
+        foreach ($params['item_attribute_value'] as  $attributeValue) {
             if (empty($attributeValue)) {
                 throw new BusinessException(BusinessErrorCode::MERCHANDISE_ATTRIBUTE_VALUE_ERROR);
             }
@@ -598,18 +605,21 @@ class MerchandiseHandler
     /**
      * 跟新商品属性和属性值
      *
+     *
      * @param $merchandiseId
      * @param $params
+     *
+     * @return array
      */
-    protected function updateMerchandiseAttributeValue($merchandiseId, $params)
+    protected function updateMerchandiseAttributeValue($merchandiseId, $params) :array
     {
         $merchandiseAttributeValueList = $this->MerchandiseAttributeValueService->getMerchandiseAttributeValueList(['merchandise_id' => $merchandiseId],
             [], ['merchandise_id', 'attribute_id', 'attribute_value_id']);
 
         // 创建商品属性和商品属性值
         $attributeIds = array_keys($params['item_attribute_value']);
+        $formattedAttributeValues = [];
         foreach ($attributeIds as $attributeId) {
-            $formattedAttributeValues = [];
             // 创建商品属性属性值
             foreach ($params['item_attribute_value'][$attributeId] as $attributeValue) {
 
@@ -627,6 +637,7 @@ class MerchandiseHandler
                 $formattedAttributeValues[] = $formattedAttributeValue;
             }
         }
+        return $formattedAttributeValues;
     }
 
 
@@ -713,27 +724,27 @@ class MerchandiseHandler
     /**
      * 商品（SPU）上下架
      *
+     *
      * @param $params
      *
-     * @return mixed
+     * @return int
      */
-    public function state($params)
+    public function state($params) :int
     {
-        $result = $this->MerchandiseService->update($params);
-        return $result;
+        return $this->MerchandiseService->update($params);
     }
 
     /**
      * 商品单品（SKU）上下架
      *
+     *
      * @param $params
      *
-     * @return mixed
+     * @return int
      */
-    public function itemState($params)
+    public function itemState($params) :int
     {
-        $result = $this->MerchandiseItemService->update($params);
-        return $result;
+        return $this->MerchandiseItemService->update($params);
     }
 
 }
