@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace App\Contract;
 
-interface AttributeValueServiceInterface
+interface AttributeValueServiceInterface extends  AbstractServiceInterface
 {
     /**
      * 根据查询条件获取属性值

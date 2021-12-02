@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace App\Contract;
 
-interface AttributeServiceInterface
+interface AttributeServiceInterface extends  AbstractServiceInterface
 {
 
     /**

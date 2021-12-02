@@ -5,15 +5,16 @@ namespace App\Service;
 
 use App\Model\Model;
 use Exception;
+use App\Contract\AbstractServiceInterface;
 
-abstract class AbstractService
+abstract class AbstractService implements AbstractServiceInterface
 {
     /**
      * @param array $params
      *
-     * @return Model|\Hyperf\Database\Model\Model
+     * @return Model
      */
-    public function create(array $params)
+    public function create(array $params) :Model
     {
         $model = $this->getModelObject();
 
@@ -63,7 +64,7 @@ abstract class AbstractService
      *
      * @return bool
      */
-    public function updateByCondition(array $params, array $condition): bool
+    public function updateByCondition(array $params, array $condition) :int
     {
         $model = $this->getModelObject();
 
@@ -77,14 +78,12 @@ abstract class AbstractService
      * @param array $condition
      *
      * @return bool
-     * @throws Exception
      */
-    public function deleteByCondition(array $condition): bool
+    public function deleteByCondition(array $condition): int
     {
         $model = $this->getModelObject();
 
-        return $this->optionWhere($model, $condition)
-                    ->delete();
+        return $this->optionWhere($model, $condition)->delete();
     }
 
 
@@ -112,7 +111,7 @@ abstract class AbstractService
      * @return array 响应数组
      *
      */
-    protected function handleParams(array $params): array
+    public function handleParams(array $params): array
     {
 
         $options = [
@@ -163,10 +162,9 @@ abstract class AbstractService
      * @param Model $model
      * @param array $conditions
      * @param array $options
-     *
-     * @return Model
+     * @return mixed
      */
-    public function optionWhere(Model $model, array $conditions, array $options = []): Model
+    public function optionWhere(Model $model, array $conditions, array $options = [])
     {
         if (!empty($conditions) && is_array($conditions)) {
 
@@ -209,7 +207,7 @@ abstract class AbstractService
      *
      * @return array
      */
-    protected function getDefaultPagedData($pageSize): array
+    public function getDefaultPagedData($pageSize): array
     {
         return [
             'page' => [
@@ -233,7 +231,7 @@ abstract class AbstractService
      *
      * @return array
      */
-    protected function getList(array $conditions = [], array $options = [], array $columns = ['*']): array
+    public function getList(array $conditions = [], array $options = [], array $columns = ['*']): array
     {
         $model              = $this->getModelObject();
         $modelWithCondition = $this->optionWhere($model, $conditions, $options);

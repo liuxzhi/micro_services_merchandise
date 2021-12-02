@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace App\Contract;
 
-interface MerchandiseItemAttributeServiceInterface
+interface MerchandiseItemAttributeServiceInterface extends  AbstractServiceInterface
 {
     /**
      * @param array $conditions

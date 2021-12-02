@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace App\Contract;
 
-interface MerchandiseItemServiceInterface
+interface MerchandiseItemServiceInterface extends  AbstractServiceInterface
 {
     /**
      * 获取商品属性列表

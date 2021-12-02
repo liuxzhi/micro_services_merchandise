@@ -93,7 +93,6 @@ class MerchandiseHandler
             $this->createMerchandiseAttributeValue($merchandiseId, $params);
             // 创建商品对应单品(SKU)
             $this->createMerchandiseItems($merchandiseId, $params);
-
             Db::commit();
 
         } catch (throwable $throwable) {
@@ -363,7 +362,7 @@ class MerchandiseHandler
                 if (in_array($attributeValueItemValue['id'], $itemCheckedAttributeValue)) {
                     $merchandiseAttributeValueAssociatedList[$key]['values'][$k]['is_checked'] = 1;
                 } else {
-                    $attributeValueItemValues[$key]['values'][$k]['is_checked'] = 0;
+                    $merchandiseAttributeValueAssociatedList[$key]['values'][$k]['is_checked'] = 0;
                 }
             }
         }
@@ -400,13 +399,12 @@ class MerchandiseHandler
         $attributeIds = [];
         foreach ($combinationAttributeValueData as $combinationAttributeValue) {
             foreach ($attributeValueList as $attributeValue) {
-                if ($combinationAttributeValue == $attributeValue['value']) {
+                if ($combinationAttributeValue == $attributeValue['id']) {
                     $attributeIds[] = $attributeValue['attribute_id'];
 
                 }
             }
         }
-
         return $attributeIds;
     }
 
@@ -510,6 +508,7 @@ class MerchandiseHandler
         $item['attribute_value_ids'] = $attributeValueCombination;
         $item['attribute_ids']       = implode(",",
             $this->getAttributeIdFromCombinations($attributeValueList, $combinationAttributeValueData));
+        print_r($item);
         $itemResult                  = $this->MerchandiseItemService->create($item);
         $itemId                      = $itemResult['id'];
         $item['id']                  = $itemId;

@@ -7,20 +7,6 @@ use App\Contract\MerchandiseItemServiceInterface;
 use App\Model\MerchandiseItem;
 use App\Model\Model;
 
-/**
- * @method array  create(array $params)
- * @method array  get(array $params, array $columns = ['*'])
- * @method int    update(array $params)
- * @method bool   updateByCondition(array $params, array $condition)
- * @method array  deleteByCondition(array $condition): bool
- * @method array  getList(array $conditions = [], array $options = [], array $columns = ['*'])
- * @method mixed  delete($params)
- * @method array  handleParams(array $params)
- * @method array  handlePagedData(array $dataWithPage, int $pageSize = 10)
- * @method Model  optionWhere(Model $model, array $conditions, array $options = []): Model
- * @method array  getDefaultPagedData($pageSize)
- */
-
 class MerchandiseItemService extends AbstractService implements MerchandiseItemServiceInterface
 {
 
