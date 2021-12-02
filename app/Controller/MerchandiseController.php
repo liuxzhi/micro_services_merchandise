@@ -89,7 +89,6 @@ class MerchandiseController extends AbstractController
 
 
     /**
-     * 获取商品和单品关联关系列表
      * @return mixed
      */
     public function merchandiseAssociatedMerchandiseItemsList()

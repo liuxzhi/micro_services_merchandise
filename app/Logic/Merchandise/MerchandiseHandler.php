@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Logic\Merchandise;
 
 
+
 use Hyperf\Di\Annotation\Inject;
 
 use App\Contract\MerchandiseServiceInterface;
@@ -21,6 +22,7 @@ use App\Constants\BusinessErrorCode;
 use App\Helper\Log;
 use throwable;
 use Hyperf\DbConnection\Db;
+use \Exception;
 
 class MerchandiseHandler
 {
@@ -79,7 +81,7 @@ class MerchandiseHandler
      * @return array
      * @throws throwable
      */
-    public function create($params)
+    public function create($params) : array
     {
         try {
             Db::beginTransaction();
@@ -104,12 +106,13 @@ class MerchandiseHandler
 
     /**
      * 获取商品(spu)和sku
-     * @param $params
-     * @param $columns
      *
-     * @return mixed
+     * @param array          $params
+     * @param array|string[] $columns
+     *
+     * @return array
      */
-    public function getMerchandiseAssociatedMerchandiseItemsList(array $params = [], array $columns = ['*'])
+    public function getMerchandiseAssociatedMerchandiseItemsList(array $params = [], array $columns = ['*']) :array
     {
         $merchandiseModel = $this->MerchandiseService->getModelObject();
 
@@ -174,7 +177,7 @@ class MerchandiseHandler
      * @return array
      * @throws throwable
      */
-    public function update(array $params)
+    public function update(array $params) :array
     {
 
         $merchandiseAttributeList = $this->MerchandiseAttributeService->getMerchandiseAttributeList(['merchandise_id' => $params['id']],
@@ -211,7 +214,7 @@ class MerchandiseHandler
      *
      * @return array
      */
-    protected function getMerchandiseAttributeValueAssociatedList($merchandiseId)
+    protected function getMerchandiseAttributeValueAssociatedList($merchandiseId) :array
     {
         // 商品属性列表
         $merchandiseAttributeList = $this->MerchandiseAttributeService->getMerchandiseAttributeList(['merchandise_id' => $merchandiseId],
@@ -626,11 +629,12 @@ class MerchandiseHandler
         }
     }
 
+
     /**
-     * 更新商品单品信息
-     *
      * @param       $merchandiseId
      * @param array $params
+     *
+     * @throws Exception
      */
     protected function updateMerchandiseItems($merchandiseId, array $params)
     {
@@ -701,7 +705,7 @@ class MerchandiseHandler
 
             $AttributeValueCondition['merchandise_id'] = $merchandiseId;
             $AttributeValueCondition[] = ['item_id' ,'IN', $merchandiseItemIds];
-            $this->MerchandiseItemAttributeValueService->deleteByCondition($AttributeCondition);
+            $this->MerchandiseItemAttributeValueService->deleteByCondition($AttributeValueCondition);
         }
 
     }

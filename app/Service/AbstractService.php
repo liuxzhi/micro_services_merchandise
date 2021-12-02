@@ -3,28 +3,31 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\Model\Model;
+use Exception;
 
 abstract class AbstractService
 {
     /**
-     * @param $params
+     * @param array $params
      *
-     * @return mixed
+     * @return Model|\Hyperf\Database\Model\Model
      */
-    public function create($params)
+    public function create(array $params)
     {
         $model = $this->getModelObject();
 
         return $model->create($params);
     }
 
+
     /**
-     * @param $params
-     * @param $columns
+     * @param array          $params
+     * @param array|string[] $columns
      *
-     * @return mixed
+     * @return array
      */
-    public function get($params, array $columns = ['*'])
+    public function get(array $params, array $columns = ['*']): array
     {
         $model = $this->getModelObject();
 
@@ -39,11 +42,11 @@ abstract class AbstractService
     }
 
     /**
-     * @param $params
+     * @param array $params
      *
-     * @return mixed
+     * @return int
      */
-    public function update($params)
+    public function update(array $params): int
     {
         $model = $this->getModelObject();
         $id    = (int)$params['id'];
@@ -55,14 +58,12 @@ abstract class AbstractService
 
 
     /**
-     * 按条件更新数据
+     * @param array $params
+     * @param array $condition
      *
-     * @param $params
-     * @param $condition
-     *
-     * @return mixed
+     * @return bool
      */
-    public function updateByCondition($params, $condition)
+    public function updateByCondition(array $params, array $condition): bool
     {
         $model = $this->getModelObject();
 
@@ -73,11 +74,12 @@ abstract class AbstractService
     /**
      * 按条件删除
      *
-     * @param      $condition
+     * @param array $condition
      *
-     * @return mixed
+     * @return bool
+     * @throws Exception
      */
-    public function deleteByCondition($condition)
+    public function deleteByCondition(array $condition): bool
     {
         $model = $this->getModelObject();
 
@@ -85,19 +87,19 @@ abstract class AbstractService
                     ->delete();
     }
 
+
     /**
      * @param $params
-     * @param $softDelete
      *
-     * @return mixed
+     * @return false|int|mixed
      */
-    public function delete($params, $softDelete = true)
+    public function delete($params)
     {
         $model = $this->getModelObject();
         $id    = (int)$params['id'];
 
         return $model->where(['id' => $id])
-                     ->update(['deleted_at' => time()]);
+                     ->delete();
 
     }
 
@@ -158,13 +160,13 @@ abstract class AbstractService
     }
 
     /**
-     * @param       $model
+     * @param Model $model
      * @param array $conditions
      * @param array $options
      *
-     * @return static
+     * @return Model
      */
-    public function optionWhere($model, array $conditions, array $options = [])
+    public function optionWhere(Model $model, array $conditions, array $options = []): Model
     {
         if (!empty($conditions) && is_array($conditions)) {
 
@@ -176,7 +178,7 @@ abstract class AbstractService
 
                 if (is_numeric($k)) {
                     $v[1]    = mb_strtoupper($v[1]);
-                    $boolean = isset($v[3]) ? $v[3] : 'and';
+                    $boolean = $v[3] ?? 'and';
                     if (in_array($v[1], ['=', '!=', '<', '<=', '>', '>=', 'LIKE', 'NOT LIKE'])) {
                         $model = $model->where($v[0], $v[1], $v[2], $boolean);
                     } elseif ($v[1] == 'IN') {
@@ -207,9 +209,9 @@ abstract class AbstractService
      *
      * @return array
      */
-    protected function getDefaultPagedData($pageSize)
+    protected function getDefaultPagedData($pageSize): array
     {
-        $defaultPageData = [
+        return [
             'page' => [
                 'pageSize'  => $pageSize,
                 'total'     => '0',
@@ -219,7 +221,6 @@ abstract class AbstractService
             'list' => [],
         ];
 
-        return $defaultPageData;
     }
 
 
@@ -232,7 +233,7 @@ abstract class AbstractService
      *
      * @return array
      */
-    protected function getList(array $conditions = [], array $options = [], array $columns = ['*'])
+    protected function getList(array $conditions = [], array $options = [], array $columns = ['*']): array
     {
         $model              = $this->getModelObject();
         $modelWithCondition = $this->optionWhere($model, $conditions, $options);
@@ -267,6 +268,6 @@ abstract class AbstractService
      * 获取model对象
      * @return mixed
      */
-    abstract public function getModelObject();
+    abstract public function getModelObject(): Model;
 
 }

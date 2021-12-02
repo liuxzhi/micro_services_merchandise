@@ -5,13 +5,20 @@ namespace App\Service;
 
 use App\Contract\MerchandiseItemAttributeValueServiceInterface;
 use App\Model\MerchandiseItemAttributeValue;
+use App\Model\Model;
 
 /**
- * @method array get()
- * @method array create()
- * @method array list()
- * @method array update()
- * @method array delete()
+ * @method array  create(array $params)
+ * @method array  get(array $params, array $columns = ['*'])
+ * @method int    update(array $params)
+ * @method bool   updateByCondition(array $params, array $condition)
+ * @method array  deleteByCondition(array $condition): bool
+ * @method array  getList(array $conditions = [], array $options = [], array $columns = ['*'])
+ * @method mixed  delete($params)
+ * @method array  handleParams(array $params)
+ * @method array  handlePagedData(array $dataWithPage, int $pageSize = 10)
+ * @method Model  optionWhere(Model $model, array $conditions, array $options = []): Model
+ * @method array  getDefaultPagedData($pageSize)
  */
 class MerchandiseItemAttributeValueService extends AbstractService implements MerchandiseItemAttributeValueServiceInterface
 {
@@ -41,7 +48,7 @@ class MerchandiseItemAttributeValueService extends AbstractService implements Me
      *
      * @return MerchandiseItemAttributeValue|mixed
      */
-    public function getModelObject()
+    public function getModelObject() :Model
     {
         return make(MerchandiseItemAttributeValue::class);
     }
