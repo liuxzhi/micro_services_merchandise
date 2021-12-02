@@ -162,7 +162,8 @@ abstract class AbstractService implements AbstractServiceInterface
      * @param Model $model
      * @param array $conditions
      * @param array $options
-     * @return mixed
+     *
+     * @return \Hyperf\Database\Query\Builder
      */
     public function optionWhere(Model $model, array $conditions, array $options = [])
     {
