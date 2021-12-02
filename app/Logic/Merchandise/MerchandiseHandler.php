@@ -26,6 +26,7 @@ use Exception;
 
 class MerchandiseHandler
 {
+
     /**
      * @Inject
      * @var AttributeServiceInterface
