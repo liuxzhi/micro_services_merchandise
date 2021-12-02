@@ -28,6 +28,9 @@ class MerchandiseController extends AbstractController
 
     /**
      * 创建商品
+     *
+     * @return array
+     * @throws \throwable
      */
     public function create()
     {
@@ -39,6 +42,9 @@ class MerchandiseController extends AbstractController
 
     /**
      * 更新商品信息
+     *
+     * @return array
+     * @throws \throwable
      */
     public function update()
     {
@@ -90,6 +96,11 @@ class MerchandiseController extends AbstractController
 
     /**
      * @return mixed
+     */
+    /**
+     * @return array
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     public function merchandiseAssociatedMerchandiseItemsList()
     {
