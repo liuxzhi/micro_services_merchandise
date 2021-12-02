@@ -31,7 +31,7 @@ class MerchandiseItemAttributeService extends AbstractService implements Merchan
      *
      * @return array
      */
-    public function getMerchandiseItemAttributeList($conditions=[], $options=[], array $columns = ['*']): array
+    public function getMerchandiseItemAttributeList(array $conditions=[], array $options=[], array $columns = ['*']): array
     {
         $model = $this->getModelObject();
         $data = $this->optionWhere($model, $conditions, $options)->select($columns)->get();
