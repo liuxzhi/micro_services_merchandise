@@ -62,9 +62,9 @@ abstract class AbstractService implements AbstractServiceInterface
      * @param array $params
      * @param array $condition
      *
-     * @return bool
+     * @return mixed
      */
-    public function updateByCondition(array $params, array $condition) :int
+    public function updateByCondition(array $params, array $condition)
     {
         $model = $this->getModelObject();
 
@@ -77,9 +77,9 @@ abstract class AbstractService implements AbstractServiceInterface
      *
      * @param array $condition
      *
-     * @return bool
+     * @return mixed
      */
-    public function deleteByCondition(array $condition): int
+    public function deleteByCondition(array $condition)
     {
         $model = $this->getModelObject();
 

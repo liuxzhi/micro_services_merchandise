@@ -37,19 +37,19 @@ interface AbstractServiceInterface
      * @param array $params
      * @param array $condition
      *
-     * @return int
+     * @return mixed
      */
-    public function updateByCondition(array $params, array $condition) :int;
+    public function updateByCondition(array $params, array $condition);
 
     /**
      * 按条件删除
      *
      * @param array $condition
      *
-     * @return int
+     * @return mixed
      * @throws Exception
      */
-    public function deleteByCondition(array $condition) :int;
+    public function deleteByCondition(array $condition);
 
 
     /**
