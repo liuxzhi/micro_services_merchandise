@@ -33,7 +33,6 @@ class MerchandiseController extends AbstractController
     /**
      * 创建商品
      *
-     *
      * @return array
      * @throws throwable
      */
