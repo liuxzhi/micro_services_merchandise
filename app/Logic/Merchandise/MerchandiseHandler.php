@@ -508,7 +508,7 @@ class MerchandiseHandler
         $item['attribute_value_ids'] = $attributeValueCombination;
         $item['attribute_ids']       = implode(",",
             $this->getAttributeIdFromCombinations($attributeValueList, $combinationAttributeValueData));
-        print_r($item);
+
         $itemResult                  = $this->MerchandiseItemService->create($item);
         $itemId                      = $itemResult['id'];
         $item['id']                  = $itemId;
