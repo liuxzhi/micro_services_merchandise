@@ -39,7 +39,9 @@ class MerchandiseController extends AbstractController
     public function create() :array
     {
         // 验证商品创建
-        $params = $this->request->all();
+	    $inputs = $this->request->all();
+	    $method = $this->getMethod(__METHOD__);
+	    $params = $this->getPayload($inputs, $method);
         Log::info("create_params", $params);
         return apiReturn(ErrorCode::SUCCESS, '', $this->merchandiseHandler->create($params));
     }
@@ -108,13 +110,12 @@ class MerchandiseController extends AbstractController
     }
 
 
-
-
-    /**
-     * @return array
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
+	/**
+	 * 获取用户列表
+	 * @return array
+	 * @throws ContainerExceptionInterface
+	 * @throws NotFoundExceptionInterface
+	 */
     public function list() :array
     {
         $inputs  = $this->request->all();
@@ -141,5 +142,25 @@ class MerchandiseController extends AbstractController
 
         return apiReturn(ErrorCode::SUCCESS, '', [ 'list' => $this->merchandiseHandler->merchandiseList($conditions, $options, $columns)]);
     }
+
+	/**
+	 * 商品绑定业务线
+	 * @return array
+	 * @throws ContainerExceptionInterface
+	 * @throws NotFoundExceptionInterface
+	 */
+    public function bind() :array
+    {
+
+	    $inputs = $this->request->all();
+	    $method = $this->getMethod(__METHOD__);
+	    $params = $this->getPayload($inputs, $method);
+
+	    Log::info("bind_params", $params);
+	    return apiReturn(ErrorCode::SUCCESS, '', $this->merchandiseHandler->bindBusiness($params));
+
+    }
+
+
 
 }

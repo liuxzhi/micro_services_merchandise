@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Logic\Merchandise;
 
-
-
 use Hyperf\Di\Annotation\Inject;
 
 use App\Contract\MerchandiseServiceInterface;
@@ -806,6 +804,26 @@ class MerchandiseHandler
     public function itemState($params) :int
     {
         return $this->MerchandiseItemService->update($params);
+    }
+
+	/**
+	 * 平台商品绑定业务线
+	 * @param $params
+	 */
+    public function bindBusiness($params)
+    {
+	    try {
+
+		    Db::beginTransaction();
+		    $this->BusinessMerchandiseService->bindBusiness($params);
+		    $this->BusinessMerchandiseItemService->bindBusiness($params);
+		    Db::commit();
+
+	    } catch (throwable $throwable) {
+		    Db::rollBack();
+		    Log::error("bind_business_error", ['params' => $params, 'message' => $throwable->getMessage()]);
+	    }
+
     }
 
 }
