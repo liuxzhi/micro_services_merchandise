@@ -109,31 +109,37 @@ class MerchandiseController extends AbstractController
 
 
 
+
     /**
      * @return array
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public function merchandiseAssociatedMerchandiseItemsList() :array
+    public function list() :array
     {
         $inputs  = $this->request->all();
 
         $method = $this->getMethod(__METHOD__);
         $params = $this->getPayload($inputs, $method);
 
-        $columns = [
-            'merchandise.id',
-            'merchandise.name',
-            'merchandise.introduction',
-            'merchandise_item.id AS item_id',
-            'merchandise_item.name AS item_name',
-            'attribute_ids',
-            'attribute_value_ids',
-            'storage',
-            'image'
-        ];
+        $conditions = $params['conditions'] ?? [];
+        $options = $params['options'] ?? [];
+        $columns = $params['columns'] ?? [];
 
-        return apiReturn(ErrorCode::SUCCESS, '', $this->merchandiseHandler->getMerchandiseAssociatedMerchandiseItemsList($params, $columns));
+        $columns ||  $columns = [
+                'merchandise.id AS merchandise_id',
+                'merchandise.name',
+                'merchandise.introduction',
+                'merchandise_item.id AS item_id',
+                'merchandise_item.name AS item_name',
+                'attribute_ids',
+                'attribute_value_ids',
+                'storage',
+                'image'
+            ];
+
+
+        return apiReturn(ErrorCode::SUCCESS, '', [ 'list' => $this->merchandiseHandler->merchandiseList($conditions, $options, $columns)]);
     }
 
 }

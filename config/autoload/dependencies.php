@@ -15,6 +15,5 @@ $dependencies =  [
     Hyperf\HttpServer\CoreMiddleware::class => App\Middleware\CoreMiddleware::class,
 ];
 
-$dependencies = array_merge($serviceDependencies, $dependencies);
+return array_merge($serviceDependencies, $dependencies);
 
-return $dependencies;

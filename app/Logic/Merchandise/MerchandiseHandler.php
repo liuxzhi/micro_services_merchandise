@@ -129,6 +129,67 @@ class MerchandiseHandler
         return $this->MerchandiseService->handlePagedData($merchandiseInfo->toArray());
     }
 
+
+    /**
+     * 获取商品列表
+     *
+     * @param array          $conditions
+     * @param array          $options
+     * @param array|string[] $columns
+     *
+     * @return array
+     */
+    public function merchandiseList(array $conditions=[], array $options=[], array $columns = ['*']) :array
+    {
+        $merchandiseModel = $this->MerchandiseService->getModelObject();
+        $data =  $this->MerchandiseService->optionWhere($merchandiseModel, $conditions, $options)->join("merchandise_item", "merchandise.id", "=",
+            "merchandise_item.merchandise_id", 'left')->select($columns)->get();
+
+        $data || $data = collect([]);
+        $merchandiseList  = $data->toArray();
+
+        if (!$merchandiseList) {
+            return  $merchandiseList;
+        }
+
+        $attributeIds = [];
+        $attributeValueIds = [];
+
+        foreach ($merchandiseList as &$item) {
+
+            $item['attribute_ids'] = explode(',', $item['attribute_ids']);
+            $item['attribute_value_ids'] = explode(',', $item['attribute_value_ids']);
+            $attributeIds = array_merge($attributeIds, $item['attribute_ids']);
+            $attributeValueIds = array_merge($attributeValueIds, $item['attribute_value_ids']);
+
+        }
+        unset($item);
+
+        $attributeIds = array_unique($attributeIds);
+        $attributeValueIds = array_unique($attributeValueIds);
+
+
+        $attributeValueList  = $this->AttributeValueService->getAttributeValueList([['id', 'IN', $attributeValueIds ]], [], ['id', 'value']);
+        $attributeList  = $this->AttributeService->getAttributeList([['id', 'IN', $attributeIds ]], [], ['id', 'name']);
+
+        $attributeValueList = array_column($attributeValueList, 'value', 'id');
+        $attributeList  =  array_column($attributeList, 'name', 'id');
+
+        foreach ($merchandiseList as &$merchandise)
+        {
+            $merchandise['item_specs_value'] = '';
+            foreach ($merchandise['attribute_ids'] as $k => $attributeId) {
+                $attributeValueId = $merchandise['attribute_value_ids'][$k];
+                $merchandise['item_specs_value'] .= " ".$attributeList[$attributeId]. ":" .$attributeValueList[$attributeValueId];
+            }
+        }
+        unset($merchandise);
+
+        return  $merchandiseList;
+
+    }
+
+
     /**
      * 获取商品详情SPU 和 SKU列表
      *
