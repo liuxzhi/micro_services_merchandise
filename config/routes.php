@@ -15,6 +15,6 @@ Router::addRoute(['GET', 'POST', 'HEAD'], '/', 'App\Controller\IndexController@i
 Router::addRoute(['GET', 'POST'], '/merchandise/create', 'App\Controller\MerchandiseController@create');
 Router::addRoute(['GET', 'POST'], '/merchandise/get', 'App\Controller\MerchandiseController@get');
 Router::addRoute(['GET', 'POST'], '/merchandise/update', 'App\Controller\MerchandiseController@update');
-Router::addRoute(['GET', 'POST'], '/merchandise/merchandiseAssociatedMerchandiseItemsList', 'App\Controller\MerchandiseController@merchandiseAssociatedMerchandiseItemsList');
+Router::addRoute(['GET', 'POST'], '/merchandise/list', 'App\Controller\MerchandiseController@list');
 Router::addRoute(['GET', 'POST'], '/merchandise/state', 'App\Controller\MerchandiseController@state');
 Router::addRoute(['GET', 'POST'], '/merchandise/item/state', 'App\Controller\MerchandiseController@itemState');
